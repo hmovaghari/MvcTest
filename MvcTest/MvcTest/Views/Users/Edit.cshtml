@@ -1,12 +1,12 @@
-﻿@model MyAccounting.Data.Model.User
+﻿@model MyAccounting.ViewModels.EditUser;
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "ویرایش کاربر";
 }
 
-<h1>Edit</h1>
+<h1>ویرایش</h1>
 
-<h4>User</h4>
+<h4>کاربر</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -24,19 +24,14 @@
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" class="form-control" type="password" />
-                <span asp-validation-for="Password" class="text-danger"></span>
+                <label asp-for="NewPassword" class="control-label"></label>
+                <input asp-for="NewPassword" class="form-control" type="password" />
+                <span asp-validation-for="NewPassword" class="text-danger"></span>
             </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
-                </label>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsAdmin" /> @Html.DisplayNameFor(model => model.IsAdmin)
-                </label>
+            <div class="form-group mb-3">
+                <label asp-for="ConfirmNewPassword" class="control-label"></label>
+                <input asp-for="ConfirmNewPassword" class="form-control" />
+                <span asp-validation-for="ConfirmNewPassword" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

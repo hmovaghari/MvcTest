@@ -125,7 +125,15 @@ namespace MvcTest.Controllers
             {
                 return NotFound();
             }
-            return View(user);
+
+            var model = new EditUser
+            {
+                UserID = user.UserID,
+                Username = user.Username,
+                Email = user.Email
+            };
+
+            return View(model);
         }
 
         // POST: Users/Edit/5
@@ -133,9 +141,9 @@ namespace MvcTest.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("UserID,Username,Email,Password,IsActive,IsAdmin")] User user)
+        public async Task<IActionResult> Edit(Guid id, [Bind("UserID,Username,Email,NewPassword,ConfirmNewPassword")] EditUser editUser)
         {
-            if (id != user.UserID)
+            if (id != editUser.UserID)
             {
                 return NotFound();
             }
@@ -144,12 +152,34 @@ namespace MvcTest.Controllers
             {
                 try
                 {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
+                    var user = await _context.Users.FindAsync(id);
+                    if (user == null)
+                    {
+                        return NotFound();
+                    }
+
+                    if (await ControllData(editUser.UserID, editUser.Username, editUser.Email))
+                    {
+                        user.Username = editUser.Username;
+                        user.Email = editUser.Email;
+                        if (!string.IsNullOrEmpty(editUser.NewPassword))
+                        {
+                            user.Salt1 = Guid.NewGuid().ToString();
+                            user.Salt2 = Guid.NewGuid().ToString();
+                            user.Password = GenerateHashedPassword(editUser.NewPassword, user.Salt1, user.Salt2);
+                        }
+                        _context.Update(user);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        return View(editUser);
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserExists(user.UserID))
+                    if (!UserExists(editUser.UserID))
                     {
                         return NotFound();
                     }
@@ -158,9 +188,8 @@ namespace MvcTest.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(user);
+            return View(editUser);
         }
 
         // GET: Users/Delete/5
