@@ -54,7 +54,7 @@ namespace MvcTest.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserID,Username,Email,Password,Salt1,Salt2,IsActive,IsAdmin")] User user)
+        public async Task<IActionResult> Create([Bind("UserID,Username,Email,Password,IsActive,IsAdmin")] User user)
         {
             if (ModelState.IsValid)
             {
@@ -87,7 +87,7 @@ namespace MvcTest.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("UserID,Username,Email,Password,Salt1,Salt2,IsActive,IsAdmin")] User user)
+        public async Task<IActionResult> Edit(Guid id, [Bind("UserID,Username,Email,Password,IsActive,IsAdmin")] User user)
         {
             if (id != user.UserID)
             {
