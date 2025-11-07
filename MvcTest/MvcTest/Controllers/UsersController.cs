@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyAccounting.Data;
 using MyAccounting.Data.Model;
+using MyAccounting.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace MvcTest.Controllers
 {
@@ -54,16 +57,59 @@ namespace MvcTest.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserID,Username,Email,Password,IsActive,IsAdmin")] User user)
+        public async Task<IActionResult> Create([Bind("UserID,Username,Email,Password,ConfirmPassword")] CreateUser createUser)
         {
+            var user = new User();
             if (ModelState.IsValid)
             {
-                user.UserID = Guid.NewGuid();
-                _context.Add(user);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (await ControllData(userID: null, createUser.Username, createUser.Email))
+                {
+                    user.UserID = Guid.NewGuid();
+                    user.Username = createUser.Username;
+                    user.Email = createUser.Email;
+                    user.Salt1 = Guid.NewGuid().ToString();
+                    user.Salt2 = Guid.NewGuid().ToString();
+                    user.Password = GenerateHashedPassword(createUser.Password, user.Salt1, user.Salt2);
+                    user.IsActive = true;
+                    user.IsAdmin = false;
+                    _context.Add(user);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
-            return View(user);
+            return View(createUser);
+        }
+
+        private string GenerateHashedPassword(string password, string salt1, string salt2)
+        {
+            var text = salt1.Replace("-", "") + password + salt2.Replace("-", "");
+            using (var sha256 = SHA256.Create())
+            {
+
+                var data = Encoding.UTF8.GetBytes(text ?? string.Empty);
+                var hashBytes = sha256.ComputeHash(data);
+                var hashString = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+                return hashString;
+            }
+        }
+
+        private async Task<bool> ControllData(Guid? userID, string username, string email)
+        {
+            // بررسی تکراری بودن نام کاربری (به جز خود کاربر)
+            if (await _context.Users.AnyAsync(u => (userID == null || u.UserID != userID) && u.Username == username))
+            {
+                ModelState.AddModelError("Username", "این نام کاربری قبلاً استفاده شده است");
+                return false;
+            }
+
+            // بررسی تکراری بودن ایمیل (به جز خود کاربر)
+            if (await _context.Users.AnyAsync(u => (userID == null || u.UserID != userID) && u.Email == email))
+            {
+                ModelState.AddModelError("Email", "این ایمیل قبلاً استفاده شده است");
+                return false;
+            }
+
+            return true;
         }
 
         // GET: Users/Edit/5
