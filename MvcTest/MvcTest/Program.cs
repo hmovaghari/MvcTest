@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MyAccounting.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace MvcTest
 {
@@ -14,6 +15,15 @@ namespace MvcTest
 
             builder.Services.AddDbContext<SqlDBContext>(options =>
             options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            // Add authentication
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Users/Login";
+                    options.LogoutPath = "/Users/Logout";
+                    options.AccessDeniedPath = "/Home/Index";
+                });
 
             var app = builder.Build();
 
@@ -30,6 +40,7 @@ namespace MvcTest
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(

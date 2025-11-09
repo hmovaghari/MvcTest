@@ -416,3 +416,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+/MvcTest/.idea
+/MvcTest/MvcTest/MyAccounting.db-shm
+/MvcTest/MvcTest/MyAccounting.db-wal

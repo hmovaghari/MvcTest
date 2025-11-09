@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyAccounting.Data;
 using MyAccounting.Data.Model;
@@ -8,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,8 +26,14 @@ namespace MvcTest.Controllers
         }
 
         // GET: Users
+        [Authorize]
         public async Task<IActionResult> Index()
         {
+            var user = await GetCurrentUser();
+            if (user == null || !user.IsAdmin)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             return View(await _context.Users.ToListAsync());
         }
 
@@ -46,9 +55,63 @@ namespace MvcTest.Controllers
             return View(user);
         }
 
-        // GET: Users/Create
-        public IActionResult Create()
+        // GET: Users/Login
+        public IActionResult Login(string returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
+        }
+
+        // POST: Users/Login
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == model.Username);
+                if (user != null)
+                {
+                    var hashedPassword = GenerateHashedPassword(model.Password, user.Salt1, user.Salt2);
+                    if (hashedPassword == user.Password)
+                    {
+                        var claims = new List<Claim>
+                        {
+                            new Claim(ClaimTypes.Name, user.Username),
+                            new Claim("UserId", user.UserID.ToString()),
+                            new Claim("IsAdmin", user.IsAdmin.ToString())
+                        };
+
+                        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
+                        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                        {
+                            return Redirect(returnUrl);
+                        }
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+                ModelState.AddModelError(string.Empty, "نام کاربری یا رمز عبور نادرست است");
+            }
+            return View(model);
+        }
+
+        // POST: Users/Logout
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Index", "Home");
+        }
+
+        // GET: Users/Create
+        public async Task<IActionResult> Create()
+        {
+            var user = await GetCurrentUser();
+            if (user != null && !user.IsAdmin)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             return View();
         }
 
@@ -113,17 +176,18 @@ namespace MvcTest.Controllers
         }
 
         // GET: Users/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction("Index", "Home");
             }
 
             var user = await _context.Users.FindAsync(id);
             if (user == null)
             {
-                return NotFound();
+                return RedirectToAction("Index", "Home");
             }
 
             var model = new EditUser
@@ -228,6 +292,15 @@ namespace MvcTest.Controllers
         private bool UserExists(Guid id)
         {
             return _context.Users.Any(e => e.UserID == id);
+        }
+
+        private async Task<User> GetCurrentUser()
+        {
+            if (!User.Identity.IsAuthenticated)
+                return null;
+
+            var username = User.Identity.Name;
+            return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         }
     }
 }
