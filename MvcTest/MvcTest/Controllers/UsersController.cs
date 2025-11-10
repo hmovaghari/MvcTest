@@ -203,7 +203,9 @@ namespace MvcTest.Controllers
             }
 
             var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            var currentUser = await GetCurrentUser();
+            
+            if (user == null || currentUser == null || (!currentUser.IsAdmin && currentUser.UserID != user.UserID))
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -275,8 +277,15 @@ namespace MvcTest.Controllers
         }
 
         // GET: Users/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(Guid? id)
         {
+            var currentUser = await GetCurrentUser();
+            if (currentUser == null || !currentUser.IsAdmin)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             if (id == null)
             {
                 return NotFound();
