@@ -46,33 +46,6 @@ namespace MvcTest.Controllers
             return View(userDTOs);
         }
 
-        // GET: Users/Details/5
-        public async Task<IActionResult> Details(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.UserID == id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            var userDTO = new UserDTO()
-            {
-                UserID = user.UserID,
-                Username = user.Username,
-                Email = user.Email,
-                IsActive = user.IsActive,
-                IsAdmin = user.IsAdmin,
-            };
-
-            return View(userDTO);
-        }
-
         // GET: Users/Login
         public IActionResult Login(string returnUrl = null)
         {
