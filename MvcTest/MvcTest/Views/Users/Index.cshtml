@@ -1,10 +1,10 @@
-﻿@model IEnumerable<MyAccounting.Data.Model.User>
+﻿@model IEnumerable<MyAccounting.ViewModels.UserDTO>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "مدیریت کاربران";
 }
 
-<h1>Index</h1>
+<h1>مدیریت کاربران</h1>
 
 <p>
     <a asp-action="Create">ایجاد کاربر جدید</a>
@@ -44,8 +44,8 @@
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.UserID">ویرایش</a> |
-                <a asp-action="Details" asp-route-id="@item.UserID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.UserID">Delete</a>
+                <a asp-action="Details" asp-route-id="@item.UserID">اطلاعات</a> |
+                <a asp-action="Delete" asp-route-id="@item.UserID">حذف</a>
             </td>
         </tr>
 }

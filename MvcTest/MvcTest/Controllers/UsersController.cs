@@ -34,7 +34,16 @@ namespace MvcTest.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
-            return View(await _context.Users.ToListAsync());
+            var users = await _context.Users.ToListAsync();
+            var userDTOs = users.Select(x => new UserDTO()
+            {
+                UserID = x.UserID,
+                Username = x.Username,
+                Email = x.Email,
+                IsActive = x.IsActive,
+                IsAdmin = x.IsAdmin,
+            });
+            return View(userDTOs);
         }
 
         // GET: Users/Details/5
@@ -52,7 +61,16 @@ namespace MvcTest.Controllers
                 return NotFound();
             }
 
-            return View(user);
+            var userDTO = new UserDTO()
+            {
+                UserID = user.UserID,
+                Username = user.Username,
+                Email = user.Email,
+                IsActive = user.IsActive,
+                IsAdmin = user.IsAdmin,
+            };
+
+            return View(userDTO);
         }
 
         // GET: Users/Login
@@ -271,7 +289,16 @@ namespace MvcTest.Controllers
                 return NotFound();
             }
 
-            return View(user);
+            var userDTO = new UserDTO()
+            {
+                UserID = user.UserID,
+                Username = user.Username,
+                Email = user.Email,
+                IsActive = user.IsActive,
+                IsAdmin = user.IsAdmin,
+            };
+
+            return View(userDTO);
         }
 
         // POST: Users/Delete/5
