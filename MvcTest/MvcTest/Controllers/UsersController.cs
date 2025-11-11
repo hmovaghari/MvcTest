@@ -16,13 +16,10 @@ using System.Threading.Tasks;
 
 namespace MvcTest.Controllers
 {
-    public class UsersController : Controller
+    public class UsersController : BaseController
     {
-        private readonly SqlDBContext _context;
-
-        public UsersController(SqlDBContext context)
+        public UsersController(SqlDBContext context) : base(context)
         {
-            _context = context;
         }
 
         // GET: Users
@@ -301,15 +298,6 @@ namespace MvcTest.Controllers
         private bool UserExists(Guid id)
         {
             return _context.Users.Any(e => e.UserID == id);
-        }
-
-        private async Task<User> GetCurrentUser()
-        {
-            if (!User.Identity.IsAuthenticated)
-                return null;
-
-            var username = User.Identity.Name;
-            return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         }
     }
 }
