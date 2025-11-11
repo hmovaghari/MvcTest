@@ -1,0 +1,30 @@
+﻿.cshtml
+@model MyAccounting.ViewModels.SettingValueDTO
+
+<tr>
+    <td>
+        <label class="form-label">@Model.SettingKeyTitle</label>
+        <input type="hidden" asp-for="SettingValueID" />
+        <input type="hidden" asp-for="SettingKeyID" />
+        <input type="hidden" asp-for="UserID" />
+        <input type="hidden" asp-for="SettingKeyTitle" />
+    </td>
+    <td>
+        @if (Model.SettingKeyTitle == "NewTrasactionDateType")
+        {
+            <select asp-for="SettingValue" class="form-control">
+                <option value="">-- انتخاب کنید --</option>
+                <option value="Now" @(Model.SettingValue == "Now" ? "selected" : "")>اکنون (Now)</option>
+                <option value="LastTransaction" @(Model.SettingValue == "LastTransaction" ? "selected" : "")>آخرین تراکنش (LastTransaction)</option>
+            </select>
+            <small class="form-text text-muted d-block mt-1">
+                تاریخ پیشفرض برای تراکنش های جدید را انتخاب کنید
+            </small>
+        }
+        else
+        {
+            <input type="text" asp-for="SettingValue" class="form-control" />
+        }
+        <span asp-validation-for="SettingValue" class="text-danger"></span>
+    </td>
+</tr>

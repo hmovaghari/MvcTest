@@ -81,10 +81,13 @@ namespace MvcTest.Controllers
             {
                 var userID = settingValueDTOs?.First().UserID;
 
-                settingValueDTOs?.ForEach(async dto =>
+                // استفاده از Task.WhenAll به جای ForEach با async
+                // settingValueDTOs?.ForEach(async dto =>
+                var tasks = settingValueDTOs?.Select(async dto =>
                 {
                     var existingSettingValue = await _context.SettingValues
                         .FirstOrDefaultAsync(sv => sv.UserID == userID && sv.SettingKeyID == dto.SettingKeyID);
+                    
                     if (existingSettingValue != null)
                     {
                         existingSettingValue.Value = dto.SettingValue;
@@ -101,12 +104,14 @@ namespace MvcTest.Controllers
                         };
                         _context.Add(newSettingValue);
                     }
-                });
+                }) ?? new List<Task>();
 
+                await Task.WhenAll(tasks);
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Index));
             }
+
             return View(settingValueDTOs);
         }
     }

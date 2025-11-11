@@ -1,0 +1,110 @@
+﻿@model List<MyAccounting.ViewModels.SettingValueDTO>
+
+@{
+    ViewData["Title"] = "ویرایش تنظیمات";
+}
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <h1>@ViewData["Title"]</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="AddOrUpdate" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            @if (Model?.Count > 0)
+            {
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>نام تنظیم</th>
+                            <th>مقدار</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            <tr>
+                                <td>
+                                    <label class="form-label">@Model[i].SettingKeyTitle</label>
+                                    <input type="hidden" name="[@i].SettingValueID" value="@Model[i].SettingValueID" />
+                                    <input type="hidden" name="[@i].SettingKeyID" value="@Model[i].SettingKeyID" />
+                                    <input type="hidden" name="[@i].UserID" value="@Model[i].UserID" />
+                                    <input type="hidden" name="[@i].SettingKeyTitle" value="@Model[i].SettingKeyTitle" />
+                                </td>
+                                <td>
+                                    @if (Model[i].SettingKeyTitle == "NewTrasactionDateType")
+                                    {
+                                        <select name="[@i].SettingValue" class="form-control">
+                                            <option value="">-- انتخاب کنید --</option>
+                                            <!--<option value="Now" @(Model[i].SettingValue == "Now" ? "selected" : "")>اکنون (Now)</option>-->
+                                            <!--<option value="Now">اکنون (Now)</option>-->
+                                            @if (Model[i].SettingValue == "Now")
+                                            {
+                                                <text>
+                                                <option value="Now" selected>اکنون (Now)</option>
+                                                </text>
+                                            }
+                                            else
+                                            {
+                                                <text>
+                                                <option value="Now">اکنون (Now)</option>
+                                                </text>
+                                            }
+                                            <!--<option value="LastTransaction" @(Model[i].SettingValue == "LastTransaction" ? "selected" : "")>آخرین تراکنش (LastTransaction)</option>-->
+                                            <!--<option value="LastTransaction">آخرین تراکنش (LastTransaction)</option>-->
+                                            @if (Model[i].SettingValue == "LastTransaction")
+                                            {
+                                                <text>
+                                                <option value="LastTransaction" selected>آخرین تراکنش (LastTransaction)</option>
+                                                </text>
+                                            }
+                                            else
+                                            {
+                                                <text>
+                                                <option value="LastTransaction">آخرین تراکنش (LastTransaction)</option>
+                                                </text>
+                                            }
+                                        </select>
+                                        <small class="form-text text-muted d-block mt-1">
+                                            تاریخ پیشفرض برای تراکنش های جدید را انتخاب کنید
+                                        </small>
+                                    }
+                                    else
+                                    {
+                                        <input type="text" name="[@i].SettingValue" value="@Model[i].SettingValue" class="form-control" />
+                                    }
+                                    <span asp-validation-for="@Model[i].SettingValue" class="text-danger"></span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <div class="d-flex gap-2 mt-3">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> ذخیره تنظیمات
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> بازگشت
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning" role="alert">
+                    تنظیمی برای ویرایش موجود نیست.
+                </div>
+            }
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

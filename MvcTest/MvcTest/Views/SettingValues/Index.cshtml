@@ -1,0 +1,59 @@
+﻿@model IEnumerable<MyAccounting.ViewModels.SettingValueDTO>
+
+@{
+    ViewData["Title"] = "تنظیمات";
+}
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <h1>@ViewData["Title"]</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        @if (Model.Any())
+        {
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>نام تنظیم</th>
+                        <th>مقدار</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SettingKeyTitle)
+                            </td>
+                            <td>
+                                @if (string.IsNullOrEmpty(item.SettingValue))
+                                {
+                                    <span class="text-muted">تعریف نشده</span>
+                                }
+                                else
+                                {
+                                    @Html.DisplayFor(modelItem => item.SettingValue)
+                                }
+                            </td>
+                            <td class="text-end">
+                                <a asp-action="AddOrUpdate" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i> ویرایش تنظیمات
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="alert alert-info" role="alert">
+                تنظیمی موجود نیست.
+            </div>
+        }
+    </div>
+</div>

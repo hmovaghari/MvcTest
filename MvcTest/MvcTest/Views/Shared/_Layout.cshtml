@@ -44,6 +44,9 @@
                                 <span class="nav-link text-dark">@User.Identity.Name</span>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="SettingValues" asp-action="Index">تنظیمات</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Users" asp-action="Edit" asp-route-id="@User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value">ویرایش کاربری</a>
                             </li>
                             <li class="nav-item">
