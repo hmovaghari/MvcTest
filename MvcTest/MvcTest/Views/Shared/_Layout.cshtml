@@ -29,6 +29,9 @@
                     <ul class="navbar-nav">
                         @if (User.Identity.IsAuthenticated)
                         {
+                            <li class="nav-item">
+                                <span class="nav-link text-dark">@User.Identity.Name</span>
+                            </li>
                             @if (bool.Parse(User.Claims.FirstOrDefault(c => c.Type == "IsAdmin")?.Value ?? "false"))
                             {
                                 <li class="nav-item dropdown">
@@ -40,9 +43,6 @@
                                     </ul>
                                 </li>
                             }
-                            <li class="nav-item">
-                                <span class="nav-link text-dark">@User.Identity.Name</span>
-                            </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="SettingValues" asp-action="Index">تنظیمات</a>
                             </li>
