@@ -1,0 +1,33 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MyAccounting.ViewModels
+{
+    public class PersonDTO
+    {
+        public Guid PersonID { get; set; }
+        public Guid UserID { get; set; }
+
+        [Display(Name = "نام")]
+        public string Name { get; set; } = string.Empty;
+
+        public Guid? CurrencyUnitID { get; set; }
+
+        [Display(Name = "واحد ارزی")]
+        public string CurrencyUnitName { get; set; }
+
+        [Display(Name = "تلفن")]
+        public string PersonTell { get; set; }
+
+        [Display(Name = "موبایل")]
+        public string PersonMobile { get; set; }
+
+        [Display(Name = "ایمیل")]
+        public string PersonEmail { get; set; }
+
+        [Display(Name = "آدرس")]
+        public string PersonAddress { get; set; }
+
+        [Display(Name = "توضیحات")]
+        public string Description { get; set; }
+    }
+}

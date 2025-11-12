@@ -1,30 +1,25 @@
-﻿@model MyAccounting.Data.Model.Person
+﻿@model MyAccounting.ViewModels.CreatePerson
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "ایجاد شخص";
 }
 
-<h1>Create</h1>
+<h1>ایجاد شخص جدید</h1>
 
-<h4>Person</h4>
+<h4>شخص</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="UserID" class="control-label"></label>
-                <select asp-for="UserID" class ="form-control" asp-items="ViewBag.UserID"></select>
-            </div>
-            <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsPerson" /> @Html.DisplayNameFor(model => model.IsPerson)
-                </label>
+            <div class="form-group">
+                <label asp-for="CurrencyUnitID" class="control-label"></label>
+                <select asp-for="CurrencyUnitID" class="form-control" asp-items="ViewBag.CurrencyUnitID"></select>
             </div>
             <div class="form-group">
                 <label asp-for="PersonTell" class="control-label"></label>
@@ -47,38 +42,19 @@
                 <span asp-validation-for="PersonAddress" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="BankAccountNumber" class="control-label"></label>
-                <input asp-for="BankAccountNumber" class="form-control" />
-                <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="BankShaba" class="control-label"></label>
-                <input asp-for="BankShaba" class="form-control" />
-                <span asp-validation-for="BankShaba" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="BankCard" class="control-label"></label>
-                <input asp-for="BankCard" class="form-control" />
-                <span asp-validation-for="BankCard" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="CurrencyUnitID" class="control-label"></label>
-                <select asp-for="CurrencyUnitID" class ="form-control" asp-items="ViewBag.CurrencyUnitID"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="ایجاد" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">بازگشت</a>
 </div>
 
 @section Scripts {
