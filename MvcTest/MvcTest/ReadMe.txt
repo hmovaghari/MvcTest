@@ -1,4 +1,6 @@
-﻿dotnet add package Microsoft.EntityFrameworkCore --version 8.*
+﻿https://accounting.weapps.ir/
+
+dotnet add package Microsoft.EntityFrameworkCore --version 8.*
 dotnet add package Microsoft.EntityFrameworkCore.Sqlite --version 8.*
 dotnet add package Microsoft.EntityFrameworkCore.Tools --version 8.*
 
