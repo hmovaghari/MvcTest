@@ -53,7 +53,8 @@ namespace MyAccounting.Data
                 new SettingKey
                 {
                     SettingKeyID = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                    Key = "NewTrasactionDateType"
+                    Key = "NewTrasactionDateType",
+                    Description = "تاریخ پیشفرض تراکنش‌های جدید"
                 }
             );
 

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyAccounting.Data;
 
@@ -10,9 +11,11 @@ using MyAccounting.Data;
 namespace MvcTest.Migrations
 {
     [DbContext(typeof(SqlDBContext))]
-    partial class SqlDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251114100540_AddDescriptionToSettingKey")]
+    partial class AddDescriptionToSettingKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.22");

@@ -7,6 +7,7 @@ namespace MyAccounting.Data.Model
     {
         public Guid SettingKeyID { get; set; }
         public string Key { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
         public ICollection<SettingValue>? SettingValues { get; }
     }
 }

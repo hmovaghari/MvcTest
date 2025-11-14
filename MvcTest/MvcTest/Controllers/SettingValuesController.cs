@@ -42,6 +42,7 @@ namespace MvcTest.Controllers
                     SettingValueID = existingValue != null ? existingValue.SettingValueID : Guid.NewGuid(),
                     SettingKeyID = key.SettingKeyID,
                     SettingKeyTitle = key.Key,
+                    SettingValueDescription = key.Description,
                     UserID = user.UserID,
                     SettingValue = existingValue != null ? existingValue.Value : string.Empty
                 });

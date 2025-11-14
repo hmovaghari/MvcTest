@@ -20,7 +20,7 @@
                 <table class="table table-bordered">
                     <thead class="table-light">
                         <tr>
-                            <th>نام تنظیم</th>
+                            <th>نام</th>
                             <th>مقدار</th>
                         </tr>
                     </thead>
@@ -29,11 +29,12 @@
                         {
                             <tr>
                                 <td>
-                                    <label class="form-label">@Model[i].SettingKeyTitle</label>
+                                    <label class="form-label">@Model[i].SettingValueDescription</label>
                                     <input type="hidden" name="[@i].SettingValueID" value="@Model[i].SettingValueID" />
                                     <input type="hidden" name="[@i].SettingKeyID" value="@Model[i].SettingKeyID" />
                                     <input type="hidden" name="[@i].UserID" value="@Model[i].UserID" />
                                     <input type="hidden" name="[@i].SettingKeyTitle" value="@Model[i].SettingKeyTitle" />
+                                    <input type="hidden" name="[@i].SettingValueDescription" value="@Model[i].SettingValueDescription" />
                                 </td>
                                 <td>
                                     @if (Model[i].SettingKeyTitle == "NewTrasactionDateType")

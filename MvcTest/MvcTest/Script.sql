@@ -123,7 +123,21 @@ CREATE INDEX "IX_TransactionType_ParentTransactionTypeID" ON "TransactionType" (
 CREATE INDEX "IX_TransactionType_UserID" ON "TransactionType" ("UserID");
 
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20251107065501_InitialCreate', '8.0.21');
+VALUES ('20251107065501_InitialCreate', '8.0.22');
+
+COMMIT;
+
+BEGIN TRANSACTION;
+
+ALTER TABLE "SettingKey" ADD "Description" TEXT NOT NULL DEFAULT '';
+
+UPDATE "SettingKey" SET "Description" = 'تاریخ پیشفرض تراکنش‌های جدید'
+WHERE "SettingKeyID" = '11111111-1111-1111-1111-111111111111';
+SELECT changes();
+
+
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20251114100540_AddDescriptionToSettingKey', '8.0.22');
 
 COMMIT;
 
