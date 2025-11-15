@@ -20,6 +20,9 @@ namespace MvcTest
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                    options.SlidingExpiration = true;
+                    options.Cookie.MaxAge = TimeSpan.FromDays(7);
                     options.LoginPath = "/Users/Login";
                     options.LogoutPath = "/Users/Logout";
                     options.AccessDeniedPath = "/Home/Index";
