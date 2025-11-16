@@ -138,6 +138,7 @@ namespace MvcTest.Controllers
                 PersonID = person.PersonID,
                 Name = person.Name,
                 CurrencyUnitID = person.CurrencyUnitID,
+                PersonEmail = person.PersonEmail,
                 PersonTell = person.PersonTell,
                 PersonMobile = person.PersonMobile,
                 PersonAddress = person.PersonAddress,
