@@ -10,23 +10,23 @@ using MyAccounting.Data.Model;
 
 namespace MvcTest.Controllers
 {
-    public class BanksController : Controller
+    public class AccountsController : Controller
     {
         private readonly SqlDBContext _context;
 
-        public BanksController(SqlDBContext context)
+        public AccountsController(SqlDBContext context)
         {
             _context = context;
         }
 
-        // GET: Banks
+        // GET: Accounts
         public async Task<IActionResult> Index()
         {
             var sqlDBContext = _context.People.Include(p => p.CurrencyUnit).Include(p => p.User);
             return View(await sqlDBContext.ToListAsync());
         }
 
-        // GET: Banks/Details/5
+        // GET: Accounts/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -46,7 +46,7 @@ namespace MvcTest.Controllers
             return View(person);
         }
 
-        // GET: Banks/Create
+        // GET: Accounts/Create
         public IActionResult Create()
         {
             ViewData["CurrencyUnitID"] = new SelectList(_context.CurrencyUnits, "CurrencyUnitID", "CurrencyUnitID");
@@ -54,7 +54,7 @@ namespace MvcTest.Controllers
             return View();
         }
 
-        // POST: Banks/Create
+        // POST: Accounts/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -73,7 +73,7 @@ namespace MvcTest.Controllers
             return View(person);
         }
 
-        // GET: Banks/Edit/5
+        // GET: Accounts/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -91,7 +91,7 @@ namespace MvcTest.Controllers
             return View(person);
         }
 
-        // POST: Banks/Edit/5
+        // POST: Accounts/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -128,7 +128,7 @@ namespace MvcTest.Controllers
             return View(person);
         }
 
-        // GET: Banks/Delete/5
+        // GET: Accounts/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -148,7 +148,7 @@ namespace MvcTest.Controllers
             return View(person);
         }
 
-        // POST: Banks/Delete/5
+        // POST: Accounts/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
