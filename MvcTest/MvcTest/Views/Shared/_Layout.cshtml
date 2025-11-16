@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MvcTest.styles.css" asp-append-version="true" />
+
+    <!-- Select2 CSS (site-wide) -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
 <body>
     <header>
@@ -83,7 +86,37 @@
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Select2 JS (site-wide) -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- Global Select2 initializer: initializes any <select class="select2"> -->
+    <script>
+        (function () {
+            if (typeof window.jQuery === 'undefined') {
+                console.warn('jQuery not found. Select2 requires jQuery. Add jQuery or move this script after jQuery.');
+                return;
+            }
+
+            $(function () {
+                // initialize only once per element
+                $('.select2').each(function () {
+                    var $el = $(this);
+                    if (!$el.data('select2')) {
+                        $el.select2({
+                            width: '100%',
+                            dir: 'rtl',        // RTL for Persian
+                            placeholder: '',
+                            allowClear: true
+                        });
+                    }
+                });
+            });
+        })();
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
