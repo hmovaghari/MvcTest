@@ -5,7 +5,7 @@ using MyAccounting.Data;
 
 namespace MvcTest.Controllers
 {
-    public class HomeController : BaseController
+    public class HomeController : BaseAuthorizeController
     {
         private readonly ILogger<HomeController> _logger;
 

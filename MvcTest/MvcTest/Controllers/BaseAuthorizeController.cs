@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace MvcTest.Controllers
 {
-    public class BaseController : Controller
+    public class BaseAuthorizeController : Controller
     {
         protected readonly SqlDBContext _context;
 
-        public BaseController(SqlDBContext context)
+        public BaseAuthorizeController(SqlDBContext context)
         {
             _context = context;
         }

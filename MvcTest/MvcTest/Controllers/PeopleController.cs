@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace MvcTest.Controllers
 {
-    public class PeopleController : BaseController
+    public class PeopleController : BaseAuthorizeController
     {
         public PeopleController(SqlDBContext context) : base(context)
         {

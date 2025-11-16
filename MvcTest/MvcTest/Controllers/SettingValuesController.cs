@@ -6,7 +6,7 @@ using MyAccounting.ViewModels;
 
 namespace MvcTest.Controllers
 {
-    public class SettingValuesController : BaseController
+    public class SettingValuesController : BaseAuthorizeController
     {
         public SettingValuesController(SqlDBContext context) : base(context)
         {

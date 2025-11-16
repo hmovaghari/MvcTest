@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace MvcTest.Controllers
 {
-    public class UsersController : BaseController
+    public class UsersController : BaseAuthorizeController
     {
         public UsersController(SqlDBContext context) : base(context)
         {
