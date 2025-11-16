@@ -141,3 +141,52 @@ VALUES ('20251114100540_AddDescriptionToSettingKey', '8.0.22');
 
 COMMIT;
 
+BEGIN TRANSACTION;
+
+CREATE TABLE "ef_temp_Person" (
+    "PersonID" TEXT NOT NULL CONSTRAINT "PK_Person" PRIMARY KEY,
+    "BankAccountNumber" TEXT NULL,
+    "BankCard" TEXT NULL,
+    "BankShaba" TEXT NULL,
+    "CurrencyUnitID" TEXT NULL,
+    "Description" TEXT NULL,
+    "IsPerson" INTEGER NOT NULL,
+    "Name" TEXT NOT NULL,
+    "PersonAddress" TEXT NULL,
+    "PersonEmail" TEXT NULL,
+    "PersonMobile" TEXT NULL,
+    "PersonTell" TEXT NULL,
+    "UserID" TEXT NOT NULL,
+    CONSTRAINT "FK_Person_CurrencyUnit_CurrencyUnitID" FOREIGN KEY ("CurrencyUnitID") REFERENCES "CurrencyUnit" ("CurrencyUnitID"),
+    CONSTRAINT "FK_Person_User_UserID" FOREIGN KEY ("UserID") REFERENCES "User" ("UserID") ON DELETE CASCADE
+);
+
+INSERT INTO "ef_temp_Person" ("PersonID", "BankAccountNumber", "BankCard", "BankShaba", "CurrencyUnitID", "Description", "IsPerson", "Name", "PersonAddress", "PersonEmail", "PersonMobile", "PersonTell", "UserID")
+SELECT "PersonID", "BankAccountNumber", "BankCard", "BankShaba", "CurrencyUnitID", "Description", "IsPerson", "Name", "PersonAddress", "PersonEmail", "PersonMobile", "PersonTell", "UserID"
+FROM "Person";
+
+COMMIT;
+
+PRAGMA foreign_keys = 0;
+
+BEGIN TRANSACTION;
+
+DROP TABLE "Person";
+
+ALTER TABLE "ef_temp_Person" RENAME TO "Person";
+
+COMMIT;
+
+PRAGMA foreign_keys = 1;
+
+BEGIN TRANSACTION;
+
+CREATE INDEX "IX_Person_CurrencyUnitID" ON "Person" ("CurrencyUnitID");
+
+CREATE INDEX "IX_Person_UserID" ON "Person" ("UserID");
+
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20251116112641_ModificationOfNon-mandatoryTextFields', '8.0.22');
+
+COMMIT;
+

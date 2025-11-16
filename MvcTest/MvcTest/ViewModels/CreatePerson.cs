@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace MyAccounting.ViewModels
 {
@@ -14,20 +15,20 @@ namespace MyAccounting.ViewModels
 
         [Display(Name = "تلفن")]
         [Phone(ErrorMessage = "فرمت تلفن صحیح نیست")]
-        public string PersonTell { get; set; }
+        public string? PersonTell { get; set; }
 
         [Display(Name = "موبایل")]
         [Phone(ErrorMessage = "فرمت موبایل صحیح نیست")]
-        public string PersonMobile { get; set; }
+        public string? PersonMobile { get; set; }
 
         [Display(Name = "ایمیل")]
         [EmailAddress(ErrorMessage = "فرمت ایمیل صحیح نیست")]
-        public string PersonEmail { get; set; }
+        public string? PersonEmail { get; set; }
 
         [Display(Name = "آدرس")]
-        public string PersonAddress { get; set; }
+        public string? PersonAddress { get; set; }
 
         [Display(Name = "توضیحات")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
     }
 }
