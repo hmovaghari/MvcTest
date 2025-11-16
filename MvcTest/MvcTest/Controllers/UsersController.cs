@@ -29,7 +29,7 @@ namespace MvcTest.Controllers
             var user = await GetCurrentUser();
             if (user == null || !user.IsAdmin)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToMainPage();
             }
             var users = await _context.Users.ToListAsync();
             var userDTOs = users.Select(x => new UserDTO()
@@ -77,7 +77,7 @@ namespace MvcTest.Controllers
                         {
                             return Redirect(returnUrl);
                         }
-                        return RedirectToAction("Index", "Home");
+                        return RedirectToMainPage();
                     }
                 }
                 ModelState.AddModelError(string.Empty, "نام کاربری یا رمز عبور نادرست است");
@@ -89,7 +89,7 @@ namespace MvcTest.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Index", "Home");
+            return RedirectToMainPage();
         }
 
         // GET: Users/Create
@@ -98,7 +98,7 @@ namespace MvcTest.Controllers
             var user = await GetCurrentUser();
             if (user != null && !user.IsAdmin)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToMainPage();
             }
             return View();
         }
@@ -169,7 +169,7 @@ namespace MvcTest.Controllers
         {
             if (id == null)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToMainPage();
             }
 
             var user = await _context.Users.FindAsync(id);
@@ -177,7 +177,7 @@ namespace MvcTest.Controllers
             
             if (user == null || currentUser == null || (!currentUser.IsAdmin && currentUser.UserID != user.UserID))
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToMainPage();
             }
 
             var model = new EditUser
@@ -253,7 +253,7 @@ namespace MvcTest.Controllers
             var currentUser = await GetCurrentUser();
             if (currentUser == null || !currentUser.IsAdmin)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToMainPage();
             }
 
             if (id == null)

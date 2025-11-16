@@ -26,7 +26,7 @@ namespace MvcTest.Controllers
             var user = await GetCurrentUser();
             if (user == null)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToMainPage();
             }
 
             var list = (
@@ -56,7 +56,7 @@ namespace MvcTest.Controllers
             var user = await GetCurrentUser();
             if (user == null)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToMainPage();
             }
             ViewData["CurrencyUnitID"] = new SelectList(_context.CurrencyUnits, "CurrencyUnitID", "Name");
             return View();
@@ -72,7 +72,7 @@ namespace MvcTest.Controllers
             var user = await GetCurrentUser();
             if (user == null)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToMainPage();
             }
 
             var person = new Person();
@@ -130,7 +130,7 @@ namespace MvcTest.Controllers
             var person = await _context.People.FindAsync(id);
             if (person == null || currentUser == null || currentUser.UserID != person.UserID)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToMainPage();
             }
             ViewData["CurrencyUnitID"] = new SelectList(_context.CurrencyUnits, "CurrencyUnitID", "Name", person.CurrencyUnitID);
             var editPerson = new EditPerson()
@@ -208,7 +208,7 @@ namespace MvcTest.Controllers
             var currentUser = await GetCurrentUser();
             if (currentUser == null)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToMainPage();
             }
 
             if (id == null)
@@ -227,7 +227,7 @@ namespace MvcTest.Controllers
 
             if (currentUser.UserID != person.UserID)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToMainPage();
             }
 
             var personDTO = new PersonDTO()

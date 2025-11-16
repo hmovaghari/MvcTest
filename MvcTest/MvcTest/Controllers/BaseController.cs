@@ -23,5 +23,10 @@ namespace MvcTest.Controllers
             var username = User.Identity.Name;
             return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         }
+
+        protected IActionResult RedirectToMainPage()
+        {
+            return RedirectToAction("Index", "Home");
+        }
     }
 }

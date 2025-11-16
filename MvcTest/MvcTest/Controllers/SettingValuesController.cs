@@ -19,7 +19,7 @@ namespace MvcTest.Controllers
             var user = await GetCurrentUser();
             if (user == null)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToMainPage();
             }
             var settingsValuesDTO = await GetsettingsValuesDTO(user);
             if (settingsValuesDTO == null)
@@ -56,7 +56,7 @@ namespace MvcTest.Controllers
             var user = await GetCurrentUser();
             if (user == null)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToMainPage();
             }
 
             var settingValueDTOs = await GetsettingsValuesDTO(user);
