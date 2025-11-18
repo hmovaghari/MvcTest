@@ -29,7 +29,7 @@ namespace MvcTest.Controllers
             return View(settingsValuesDTO);
         }
 
-        private async Task<List<SettingValueDTO>> GetsettingsValuesDTO(MyAccounting.Data.Model.User user)
+        private async Task<List<SettingValueDTO>> GetsettingsValuesDTO(UserDTO user)
         {
             var settingsKeys = await _context.SettingKeys.ToListAsync();
             var settingsValues = await _context.SettingValues.Where(sv => sv.UserID == user.UserID).ToListAsync();

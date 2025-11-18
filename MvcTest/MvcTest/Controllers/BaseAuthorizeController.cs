@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using MyAccounting.Data;
 using MyAccounting.Data.Model;
 using System.Threading.Tasks;
+using MvcTest.Repository;
+using MyAccounting.ViewModels;
 
 namespace MvcTest.Controllers
 {
@@ -15,13 +17,14 @@ namespace MvcTest.Controllers
             _context = context;
         }
 
-        protected async Task<User> GetCurrentUser()
+        protected async Task<UserDTO?> GetCurrentUser()
         {
             if (!User.Identity.IsAuthenticated)
                 return null;
 
             var username = User.Identity.Name;
-            return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            var _userRepository = new UserRepository(_context);
+            return await _userRepository.GetUserByUsername(username);
         }
 
         protected IActionResult RedirectToMainPage()
