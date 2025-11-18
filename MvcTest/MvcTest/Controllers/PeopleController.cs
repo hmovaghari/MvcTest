@@ -51,6 +51,7 @@ namespace MvcTest.Controllers
         }
 
         // GET: People/Create
+        [Authorize]
         public async Task<IActionResult> Create()
         {
             var user = await GetCurrentUser();
@@ -119,6 +120,7 @@ namespace MvcTest.Controllers
         }
 
         // GET: People/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -203,6 +205,7 @@ namespace MvcTest.Controllers
         }
 
         // GET: People/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(Guid? id)
         {
             var currentUser = await GetCurrentUser();
