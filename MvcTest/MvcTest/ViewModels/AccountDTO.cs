@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MvcTest.ViewModels
+namespace MyAccounting.ViewModels
 {
     public class AccountDTO
     {
