@@ -1,56 +1,64 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyAccounting.Data;
 using MyAccounting.Data.Model;
+using MyAccounting.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MvcTest.Controllers
 {
-    public class AccountsController : Controller
+    public class AccountsController : BaseAuthorizeController
     {
-        private readonly SqlDBContext _context;
-
-        public AccountsController(SqlDBContext context)
-        {
-            _context = context;
+        public AccountsController(SqlDBContext context) : base(context)
+    {
+            
         }
 
         // GET: Accounts
+        [Authorize]
         public async Task<IActionResult> Index()
         {
-            var sqlDBContext = _context.People.Include(p => p.CurrencyUnit).Include(p => p.User);
-            return View(await sqlDBContext.ToListAsync());
-        }
-
-        // GET: Accounts/Details/5
-        public async Task<IActionResult> Details(Guid? id)
-        {
-            if (id == null)
+            var user = await GetCurrentUser();
+            if (user == null)
             {
-                return NotFound();
+                return RedirectToMainPage();
             }
 
-            var person = await _context.People
-                .Include(p => p.CurrencyUnit)
-                .Include(p => p.User)
-                .FirstOrDefaultAsync(m => m.PersonID == id);
-            if (person == null)
-            {
-                return NotFound();
-            }
-
-            return View(person);
+            var list = (
+                await _context.People
+                .Include(a => a.CurrencyUnit)
+                .Include(a => a.User)
+                .Where(a => a.UserID == user.UserID && !a.IsPerson).ToListAsync()
+                ).Select(a => new AccountDTO()
+                {
+                    PersonID = a.PersonID,
+                    UserID = a.UserID,
+                    Name = a.Name,
+                    CurrencyUnitID = a.CurrencyUnitID,
+                    CurrencyUnitName = a.CurrencyUnit != null ? a.CurrencyUnit.Name : string.Empty,
+                    BankAccountNumber = a.BankAccountNumber,
+                    BankCard = a.BankCard,
+                    BankShaba = a.BankShaba,
+                    Description = a.Description
+                }).ToList();
+            return View(list);
         }
 
         // GET: Accounts/Create
-        public IActionResult Create()
+        [Authorize]
+        public async Task<IActionResult> Create()
         {
-            ViewData["CurrencyUnitID"] = new SelectList(_context.CurrencyUnits, "CurrencyUnitID", "CurrencyUnitID");
-            ViewData["UserID"] = new SelectList(_context.Users, "UserID", "Username");
+            var user = await GetCurrentUser();
+            if (user == null)
+            {
+                return RedirectToMainPage();
+            }
+            ViewData["CurrencyUnitID"] = new SelectList(_context.CurrencyUnits, "CurrencyUnitID", "Name");
             return View();
         }
 
@@ -59,21 +67,58 @@ namespace MvcTest.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PersonID,UserID,Name,IsPerson,PersonTell,PersonMobile,PersonEmail,PersonAddress,BankAccountNumber,BankShaba,BankCard,Description,CurrencyUnitID")] Person person)
+        public async Task<IActionResult> Create([Bind("PersonID,CurrencyUnitID,UserID,Name,BankAccountNumber,BankShaba,BankCard,Description")] CreateAccount createAccount)
         {
+            var user = await GetCurrentUser();
+            if (user == null)
+            {
+                return RedirectToMainPage();
+            }
+
+            var account = new Person();
+            account.UserID = user.UserID;
             if (ModelState.IsValid)
             {
-                person.PersonID = Guid.NewGuid();
-                _context.Add(person);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (await ControlData(personID: null, user.UserID, createAccount.Name))
+                {
+                    account.PersonID = Guid.NewGuid();
+                    account.Name = createAccount.Name;
+                    account.IsPerson = false;
+                    account.CurrencyUnitID = createAccount.CurrencyUnitID;
+                    account.BankAccountNumber = createAccount.BankAccountNumber;
+                    account.BankShaba = createAccount.BankShaba;
+                    account.BankCard = createAccount.BankCard;
+                    account.Description = createAccount.Description;
+                    _context.Add(account);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
-            ViewData["CurrencyUnitID"] = new SelectList(_context.CurrencyUnits, "CurrencyUnitID", "CurrencyUnitID", person.CurrencyUnitID);
-            ViewData["UserID"] = new SelectList(_context.Users, "UserID", "Username", person.UserID);
-            return View(person);
+            ViewData["CurrencyUnitID"] = new SelectList(_context.CurrencyUnits, "CurrencyUnitID", "Name", createAccount.CurrencyUnitID);
+            return View(account);
+        }
+
+        private async Task<bool> ControlData(Guid? personID, Guid userID, string name, Guid? oldCurrencyUnitID = null, Guid? newCurrencyUnitID = null)
+        {
+            // بررسی تکراری بودن نام طرف حساب (به جز خود طرف حساب)
+            if (await _context.People.AnyAsync(p => (personID == null || p.PersonID != personID) && p.UserID == userID && p.Name == name))
+            {
+                ModelState.AddModelError("Name", "این نام قبلاً استفاده شده است");
+                return false;
+            }
+
+            if (personID != null && oldCurrencyUnitID != null && newCurrencyUnitID != null && oldCurrencyUnitID != newCurrencyUnitID &&
+                await _context.Transactions.AnyAsync(t => t.PayerPersonID == personID || t.ReceiverPersonID == personID))
+            {
+                ModelState.AddModelError("CurrencyUnitID", "به دلیل استفاده در تراکنش‌ها امکان ویرایش نیست");
+                return false;
+            }
+
+            return true;
         }
 
         // GET: Accounts/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -81,14 +126,24 @@ namespace MvcTest.Controllers
                 return NotFound();
             }
 
-            var person = await _context.People.FindAsync(id);
-            if (person == null)
+            var currentUser = await GetCurrentUser();
+            var account = await _context.People.FindAsync(id);
+            if (account == null || currentUser == null || currentUser.UserID != account.UserID)
             {
-                return NotFound();
+                return RedirectToMainPage();
             }
-            ViewData["CurrencyUnitID"] = new SelectList(_context.CurrencyUnits, "CurrencyUnitID", "CurrencyUnitID", person.CurrencyUnitID);
-            ViewData["UserID"] = new SelectList(_context.Users, "UserID", "Username", person.UserID);
-            return View(person);
+            ViewData["CurrencyUnitID"] = new SelectList(_context.CurrencyUnits, "CurrencyUnitID", "Name", account.CurrencyUnitID);
+            var editBank = new EditAccount()
+            {
+                PersonID = account.PersonID,
+                Name = account.Name,
+                CurrencyUnitID = account.CurrencyUnitID,
+                BankAccountNumber = account.BankAccountNumber,
+                BankShaba = account.BankShaba,
+                BankCard = account.BankCard,
+                Description = account.Description
+            };
+            return View(editBank);
         }
 
         // POST: Accounts/Edit/5
@@ -96,23 +151,42 @@ namespace MvcTest.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("PersonID,UserID,Name,IsPerson,PersonTell,PersonMobile,PersonEmail,PersonAddress,BankAccountNumber,BankShaba,BankCard,Description,CurrencyUnitID")] Person person)
+        public async Task<IActionResult> Edit(Guid id, [Bind("PersonID,UserID,Name,CurrencyUnitID,BankAccountNumber,BankShaba,BankCard,Description")] EditAccount editAccount)
         {
-            if (id != person.PersonID)
+            if (id != editAccount.PersonID)
             {
                 return NotFound();
             }
+
+            var currencyUnitID = editAccount.CurrencyUnitID;
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(person);
-                    await _context.SaveChangesAsync();
+                    var account = await _context.People.FindAsync(id);
+                    if (account == null)
+                    {
+                        return NotFound();
+                    }
+
+                    currencyUnitID = account.CurrencyUnitID;
+
+                    if (await ControlData(account.PersonID, account.UserID, account.Name, account.CurrencyUnitID, editAccount.CurrencyUnitID))
+                    {
+                        account.Name = editAccount.Name;
+                        account.CurrencyUnitID = editAccount.CurrencyUnitID;
+                        account.BankAccountNumber = editAccount.BankAccountNumber;
+                        account.BankShaba = editAccount.BankShaba;
+                        account.BankCard = editAccount.BankCard;
+                        account.Description = editAccount.Description;
+                        _context.Update(account);
+                        await _context.SaveChangesAsync();
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PersonExists(person.PersonID))
+                    if (!PersonExists(editAccount.PersonID))
                     {
                         return NotFound();
                     }
@@ -123,29 +197,46 @@ namespace MvcTest.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CurrencyUnitID"] = new SelectList(_context.CurrencyUnits, "CurrencyUnitID", "CurrencyUnitID", person.CurrencyUnitID);
-            ViewData["UserID"] = new SelectList(_context.Users, "UserID", "Username", person.UserID);
-            return View(person);
+            ViewData["CurrencyUnitID"] = new SelectList(_context.CurrencyUnits, "CurrencyUnitID", "Name", currencyUnitID);
+            return View(editAccount);
         }
 
         // GET: Accounts/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(Guid? id)
         {
+            var currentUser = await GetCurrentUser();
+            if (currentUser == null)
+            {
+                return RedirectToMainPage();
+            }
+
             if (id == null)
             {
                 return NotFound();
             }
 
-            var person = await _context.People
+            var account = await _context.People
                 .Include(p => p.CurrencyUnit)
                 .Include(p => p.User)
                 .FirstOrDefaultAsync(m => m.PersonID == id);
-            if (person == null)
+            if (account == null)
             {
                 return NotFound();
             }
 
-            return View(person);
+            if (currentUser.UserID != account.UserID)
+            {
+                return RedirectToMainPage();
+            }
+
+            var accountDTO = new AccountDTO()
+            {
+                PersonID = account.PersonID,
+                Name = account.Name,
+            };
+
+            return View(accountDTO);
         }
 
         // POST: Accounts/Delete/5
@@ -153,10 +244,10 @@ namespace MvcTest.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            var person = await _context.People.FindAsync(id);
-            if (person != null)
+            var account = await _context.People.FindAsync(id);
+            if (account != null)
             {
-                _context.People.Remove(person);
+                _context.People.Remove(account);
             }
 
             await _context.SaveChangesAsync();
