@@ -1,16 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MvcTest.Controllers;
 using MyAccounting.Data;
 using MyAccounting.Data.Model;
 using MyAccounting.ViewModels;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace MvcTest.Repository
+namespace MyAccounting.Repository
 {
     public class UserRepository
     {
-        SqlDBContext _context;
+        private SqlDBContext _context;
 
         public UserRepository(SqlDBContext contex)
         {

@@ -1,4 +1,4 @@
-namespace MvcTest.Models
+namespace MyAccounting.Models
 {
     public class ErrorViewModel
     {

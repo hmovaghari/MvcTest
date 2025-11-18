@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using MyAccounting.Data;
 using MyAccounting.ViewModels;
 using System.Security.Claims;
-using MvcTest.Repository;
+using MyAccounting.Repository;
 
-namespace MvcTest.Controllers
+namespace MyAccounting.Controllers
 {
     public class UsersController : BaseAuthorizeController
     {

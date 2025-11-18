@@ -2,21 +2,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using MyAccounting.Repository;
 using MyAccounting.Data;
 using MyAccounting.Data.Model;
 using MyAccounting.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace MvcTest.Controllers
+namespace MyAccounting.Controllers
 {
     public class AccountsController : BaseAuthorizeController
     {
+        AccountPartyRepository _accountPartyRepository;
+
         public AccountsController(SqlDBContext context) : base(context)
-    {
-            
+        {
+            _accountPartyRepository = new AccountPartyRepository(context);
         }
 
         // GET: Accounts

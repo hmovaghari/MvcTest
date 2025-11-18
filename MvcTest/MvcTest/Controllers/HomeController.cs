@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using MvcTest.Models;
 using MyAccounting.Data;
+using MyAccounting.Models;
 
-namespace MvcTest.Controllers
+namespace MyAccounting.Controllers
 {
     public class HomeController : BaseAuthorizeController
     {

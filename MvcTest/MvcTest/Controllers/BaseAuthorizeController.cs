@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using MyAccounting.Data;
 using MyAccounting.Data.Model;
 using System.Threading.Tasks;
-using MvcTest.Repository;
+using MyAccounting.Repository;
 using MyAccounting.ViewModels;
 
-namespace MvcTest.Controllers
+namespace MyAccounting.Controllers
 {
     public class BaseAuthorizeController : Controller
     {

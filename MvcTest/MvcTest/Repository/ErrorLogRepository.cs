@@ -1,6 +1,6 @@
 ﻿using MyAccounting.Data;
 
-namespace MvcTest.Controllers
+namespace MyAccounting.Repository
 {
     public class ErrorLogRepository
     {

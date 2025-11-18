@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MvcTest.Controllers;
 using MyAccounting.Data;
 using MyAccounting.Data.Model;
 using MyAccounting.ViewModels;
 
-namespace MvcTest.Repository
+namespace MyAccounting.Repository
 {
     public class SettingValueRepository
     {

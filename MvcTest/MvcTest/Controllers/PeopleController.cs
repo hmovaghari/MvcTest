@@ -2,21 +2,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using MyAccounting.Data;
 using MyAccounting.Data.Model;
 using MyAccounting.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using MyAccounting.Repository;
 
-namespace MvcTest.Controllers
+namespace MyAccounting.Controllers
 {
     public class PeopleController : BaseAuthorizeController
     {
+        AccountPartyRepository _accountPartyRepository;
+
         public PeopleController(SqlDBContext context) : base(context)
         {
+            _accountPartyRepository = new AccountPartyRepository(context);
         }
 
         // GET: People

@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MvcTest.Repository;
+using MyAccounting.Repository;
 using MyAccounting.Data;
 using MyAccounting.ViewModels;
 
-namespace MvcTest.Controllers
+namespace MyAccounting.Controllers
 {
     public class SettingValuesController : BaseAuthorizeController
     {
