@@ -2,9 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using MyAccounting.Repository;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using MyAccounting.Data;
 using MyAccounting.Data.Model;
+using MyAccounting.Repository;
 using MyAccounting.ViewModels;
 
 namespace MyAccounting.Controllers
@@ -28,23 +29,7 @@ namespace MyAccounting.Controllers
                 return RedirectToMainPage();
             }
 
-            var list = (
-                await _context.People
-                .Include(a => a.CurrencyUnit)
-                .Include(a => a.User)
-                .Where(a => a.UserID == user.UserID && !a.IsPerson).ToListAsync()
-                ).Select(a => new AccountDTO()
-                {
-                    PersonID = a.PersonID,
-                    UserID = a.UserID,
-                    Name = a.Name,
-                    CurrencyUnitID = a.CurrencyUnitID,
-                    CurrencyUnitName = a.CurrencyUnit != null ? a.CurrencyUnit.Name : string.Empty,
-                    BankAccountNumber = a.BankAccountNumber,
-                    BankCard = a.BankCard,
-                    BankShaba = a.BankShaba,
-                    Description = a.Description
-                }).ToList();
+            var list = await _accountPartyRepository.GetAccounts();
             return View(list);
         }
 
@@ -74,42 +59,26 @@ namespace MyAccounting.Controllers
                 return RedirectToMainPage();
             }
 
-            var account = new Person();
-            account.UserID = user.UserID;
             if (ModelState.IsValid)
             {
                 if (await ControlData(personID: null, user.UserID, createAccount.Name))
                 {
-                    account.PersonID = Guid.NewGuid();
-                    account.Name = createAccount.Name;
-                    account.IsPerson = false;
-                    account.CurrencyUnitID = createAccount.CurrencyUnitID;
-                    account.BankAccountNumber = createAccount.BankAccountNumber;
-                    account.BankShaba = createAccount.BankShaba;
-                    account.BankCard = createAccount.BankCard;
-                    account.Description = createAccount.Description;
-                    _context.Add(account);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    if (await _accountPartyRepository.CreateAccountAsync(createAccount, user.UserID))
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
                 }
             }
             ViewData["CurrencyUnitID"] = new SelectList(_context.CurrencyUnits, "CurrencyUnitID", "Name", createAccount.CurrencyUnitID);
-            return View(account);
+            return View(createAccount);
         }
 
         private async Task<bool> ControlData(Guid? personID, Guid userID, string name, Guid? oldCurrencyUnitID = null, Guid? newCurrencyUnitID = null)
         {
-            // بررسی تکراری بودن نام طرف حساب (به جز خود طرف حساب)
-            if (await _context.People.AnyAsync(p => (personID == null || p.PersonID != personID) && p.UserID == userID && p.Name == name))
+            var controlData = await _accountPartyRepository.ControlData(personID, userID, name, oldCurrencyUnitID, newCurrencyUnitID);
+            if (controlData != null)
             {
-                ModelState.AddModelError("Name", "این نام قبلاً استفاده شده است");
-                return false;
-            }
-
-            if (personID != null && oldCurrencyUnitID != null && newCurrencyUnitID != null && oldCurrencyUnitID != newCurrencyUnitID &&
-                await _context.Transactions.AnyAsync(t => t.PayerPersonID == personID || t.ReceiverPersonID == personID))
-            {
-                ModelState.AddModelError("CurrencyUnitID", "به دلیل استفاده در تراکنش‌ها امکان ویرایش نیست");
+                ModelState.AddModelError(controlData.Value.Item1, controlData.Value.Item2);
                 return false;
             }
 
@@ -126,7 +95,7 @@ namespace MyAccounting.Controllers
             }
 
             var currentUser = await GetCurrentUser();
-            var account = await _context.People.FindAsync(id);
+            var account = await _accountPartyRepository.FindAsync(id);
             if (account == null || currentUser == null || currentUser.UserID != account.UserID)
             {
                 return RedirectToMainPage();
@@ -161,40 +130,23 @@ namespace MyAccounting.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                var account = await _accountPartyRepository.FindAsync(id);
+                if (account == null)
                 {
-                    var account = await _context.People.FindAsync(id);
-                    if (account == null)
-                    {
-                        return NotFound();
-                    }
+                    return NotFound();
+                }
 
-                    currencyUnitID = account.CurrencyUnitID;
+                currencyUnitID = account.CurrencyUnitID;
 
-                    if (await ControlData(account.PersonID, account.UserID, account.Name, account.CurrencyUnitID, editAccount.CurrencyUnitID))
+                if (await ControlData(account.PersonID, account.UserID, account.Name, account.CurrencyUnitID, editAccount.CurrencyUnitID))
+                {
+                    var accountParty = await _accountPartyRepository.MapToAsync(editAccount);
+
+                    if (await _accountPartyRepository.EdiAsync(accountParty, isPerson: false))
                     {
-                        account.Name = editAccount.Name;
-                        account.CurrencyUnitID = editAccount.CurrencyUnitID;
-                        account.BankAccountNumber = editAccount.BankAccountNumber;
-                        account.BankShaba = editAccount.BankShaba;
-                        account.BankCard = editAccount.BankCard;
-                        account.Description = editAccount.Description;
-                        _context.Update(account);
-                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
                     }
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PersonExists(editAccount.PersonID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
             }
             ViewData["CurrencyUnitID"] = new SelectList(_context.CurrencyUnits, "CurrencyUnitID", "Name", currencyUnitID);
             return View(editAccount);
@@ -251,11 +203,6 @@ namespace MyAccounting.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool PersonExists(Guid id)
-        {
-            return _context.People.Any(e => e.PersonID == id);
         }
     }
 }

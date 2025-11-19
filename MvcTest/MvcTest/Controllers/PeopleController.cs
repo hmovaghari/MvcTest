@@ -28,24 +28,7 @@ namespace MyAccounting.Controllers
                 return RedirectToMainPage();
             }
 
-            var list = (
-                await _context.People
-                .Include(p => p.CurrencyUnit)
-                .Include(p => p.User)
-                .Where(p => p.UserID == user.UserID && p.IsPerson).ToListAsync()
-                ).Select(p => new PersonDTO()
-            {
-                    PersonID = p.PersonID,
-                    UserID = p.UserID,
-                    Name = p.Name,
-                    CurrencyUnitID = p.CurrencyUnitID,
-                    CurrencyUnitName = p.CurrencyUnit != null ? p.CurrencyUnit.Name : string.Empty,
-                    PersonTell = p.PersonTell,
-                    PersonMobile = p.PersonMobile,
-                    PersonEmail = p.PersonEmail,
-                    PersonAddress = p.PersonAddress,
-                    Description = p.Description
-                }).ToList();
+            var list = await _accountPartyRepository.GetPeople();
             return View(list);
         }
 
@@ -75,24 +58,14 @@ namespace MyAccounting.Controllers
                 return RedirectToMainPage();
             }
 
-            var person = new Person();
-            person.UserID = user.UserID;
             if (ModelState.IsValid)
             {
                 if (await ControlData(personID: null, user.UserID, createPerson.Name))
                 {
-                    person.PersonID = Guid.NewGuid();
-                    person.Name = createPerson.Name;
-                    person.IsPerson = true;
-                    person.CurrencyUnitID = createPerson.CurrencyUnitID;
-                    person.PersonTell = createPerson.PersonTell;
-                    person.PersonMobile = createPerson.PersonMobile;
-                    person.PersonEmail = createPerson.PersonEmail;
-                    person.PersonAddress = createPerson.PersonAddress;
-                    person.Description = createPerson.Description;
-                    _context.Add(person);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    if (await _accountPartyRepository.CreatePersonAsync(createPerson, user.UserID))
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
                 }
             }
             ViewData["CurrencyUnitID"] = new SelectList(_context.CurrencyUnits, "CurrencyUnitID", "Name", createPerson.CurrencyUnitID);
@@ -101,17 +74,10 @@ namespace MyAccounting.Controllers
 
         private async Task<bool> ControlData(Guid? personID, Guid userID, string name, Guid? oldCurrencyUnitID = null, Guid? newCurrencyUnitID = null)
         {
-            // بررسی تکراری بودن نام طرف حساب (به جز خود طرف حساب)
-            if (await _context.People.AnyAsync(p => (personID == null || p.PersonID != personID) && p.UserID == userID && p.Name == name))
+            var controlData = await _accountPartyRepository.ControlData(personID, userID, name, oldCurrencyUnitID, newCurrencyUnitID);
+            if (controlData != null)
             {
-                ModelState.AddModelError("Name", "این نام قبلاً استفاده شده است");
-                return false;
-            }
-
-            if (personID != null && oldCurrencyUnitID != null && newCurrencyUnitID != null && oldCurrencyUnitID != newCurrencyUnitID &&
-                await _context.Transactions.AnyAsync(t => t.PayerPersonID == personID || t.ReceiverPersonID == personID))
-            {
-                ModelState.AddModelError("CurrencyUnitID", "به دلیل استفاده در تراکنش‌ها امکان ویرایش نیست");
+                ModelState.AddModelError(controlData.Value.Item1, controlData.Value.Item2);
                 return false;
             }
 
@@ -128,7 +94,7 @@ namespace MyAccounting.Controllers
             }
 
             var currentUser = await GetCurrentUser();
-            var person = await _context.People.FindAsync(id);
+            var person = await _accountPartyRepository.FindAsync(id);
             if (person == null || currentUser == null || currentUser.UserID != person.UserID)
             {
                 return RedirectToMainPage();
@@ -164,40 +130,23 @@ namespace MyAccounting.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                var person = await _accountPartyRepository.FindAsync(id);
+                if (person == null)
                 {
-                    var person = await _context.People.FindAsync(id);
-                    if (person == null)
-                    {
-                        return NotFound();
-                    }
+                    return NotFound();
+                }
 
-                    currencyUnitID = person.CurrencyUnitID;
+                currencyUnitID = person.CurrencyUnitID;
 
-                    if (await ControlData(person.PersonID, person.UserID, editPerson.Name, person.CurrencyUnitID, editPerson.CurrencyUnitID))
+                if (await ControlData(person.PersonID, person.UserID, editPerson.Name, person.CurrencyUnitID, editPerson.CurrencyUnitID))
+                {
+                    var accountParty = await _accountPartyRepository.MapToAsync(editPerson);
+
+                    if (await _accountPartyRepository.EdiAsync(accountParty, isPerson: false))
                     {
-                        person.Name = editPerson.Name;
-                        person.CurrencyUnitID = editPerson.CurrencyUnitID;
-                        person.PersonTell = editPerson.PersonTell;
-                        person.PersonMobile = editPerson.PersonMobile;
-                        person.PersonAddress = editPerson.PersonAddress;
-                        person.Description = editPerson.Description;
-                        _context.Update(person);
-                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
                     }
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PersonExists(editPerson.PersonID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
             }
             ViewData["CurrencyUnitID"] = new SelectList(_context.CurrencyUnits, "CurrencyUnitID", "Name", currencyUnitID);
             return View(editPerson);

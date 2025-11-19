@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MyAccounting.ViewModels;
+using System.ComponentModel.DataAnnotations;
 
-namespace MyAccounting.ViewModels
+namespace MvcTest.ViewModels
 {
-    public class PersonDTO
+    public class AccountPartyDTO
     {
         public Guid PersonID { get; set; }
         public Guid UserID { get; set; }
@@ -26,6 +27,15 @@ namespace MyAccounting.ViewModels
 
         [Display(Name = "آدرس")]
         public string? PersonAddress { get; set; }
+
+        [Display(Name = "شماره حساب")]
+        public string? BankAccountNumber { get; set; }
+
+        [Display(Name = "شماره شبا")]
+        public string? BankShaba { get; set; }
+
+        [Display(Name = "شماره کارت")]
+        public string? BankCard { get; set; }
 
         [Display(Name = "توضیحات")]
         public string? Description { get; set; }
