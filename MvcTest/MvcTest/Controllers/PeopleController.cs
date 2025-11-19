@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using MyAccounting.Data;
-using MyAccounting.Data.Model;
 using MyAccounting.ViewModels;
 using MyAccounting.Repository;
 
@@ -11,11 +8,13 @@ namespace MyAccounting.Controllers
 {
     public class PeopleController : BaseAuthorizeController
     {
-        AccountPartyRepository _accountPartyRepository;
+        private AccountPartyRepository _accountPartyRepository;
+        private CurrencyUnitRepository _currencyUnitRepository;
 
         public PeopleController(SqlDBContext context) : base(context)
         {
             _accountPartyRepository = new AccountPartyRepository(context);
+            _currencyUnitRepository = new CurrencyUnitRepository(context);
         }
 
         // GET: People
@@ -28,7 +27,7 @@ namespace MyAccounting.Controllers
                 return RedirectToMainPage();
             }
 
-            var list = await _accountPartyRepository.GetPeople();
+            var list = await _accountPartyRepository.GetPeople(user.UserID);
             return View(list);
         }
 
@@ -41,7 +40,8 @@ namespace MyAccounting.Controllers
             {
                 return RedirectToMainPage();
             }
-            ViewData["CurrencyUnitID"] = new SelectList(_context.CurrencyUnits, "CurrencyUnitID", "Name");
+
+            ViewData["CurrencyUnitID"] = _currencyUnitRepository.GetSelectList();
             return View();
         }
 
@@ -62,13 +62,14 @@ namespace MyAccounting.Controllers
             {
                 if (await ControlData(personID: null, user.UserID, createPerson.Name))
                 {
-                    if (await _accountPartyRepository.CreatePersonAsync(createPerson, user.UserID))
+                    var accountParty = _accountPartyRepository.MapToAccountPartyAsync(createPerson);
+                    if (await _accountPartyRepository.CreateAccountPartyAsync(accountParty, user.UserID, isPerson: true))
                     {
                         return RedirectToAction(nameof(Index));
                     }
                 }
             }
-            ViewData["CurrencyUnitID"] = new SelectList(_context.CurrencyUnits, "CurrencyUnitID", "Name", createPerson.CurrencyUnitID);
+            ViewData["CurrencyUnitID"] = _currencyUnitRepository.GetSelectList(createPerson.CurrencyUnitID);
             return View(createPerson);
         }
 
@@ -99,7 +100,7 @@ namespace MyAccounting.Controllers
             {
                 return RedirectToMainPage();
             }
-            ViewData["CurrencyUnitID"] = new SelectList(_context.CurrencyUnits, "CurrencyUnitID", "Name", person.CurrencyUnitID);
+            ViewData["CurrencyUnitID"] = _currencyUnitRepository.GetSelectList(person.CurrencyUnitID);
             var editPerson = new EditPerson()
             {
                 PersonID = person.PersonID,
@@ -140,7 +141,7 @@ namespace MyAccounting.Controllers
 
                 if (await ControlData(person.PersonID, person.UserID, editPerson.Name, person.CurrencyUnitID, editPerson.CurrencyUnitID))
                 {
-                    var accountParty = await _accountPartyRepository.MapToAsync(editPerson);
+                    var accountParty = _accountPartyRepository.MapToAccountPartyAsync(editPerson);
 
                     if (await _accountPartyRepository.EdiAsync(accountParty, isPerson: false))
                     {
@@ -148,7 +149,7 @@ namespace MyAccounting.Controllers
                     }
                 }
             }
-            ViewData["CurrencyUnitID"] = new SelectList(_context.CurrencyUnits, "CurrencyUnitID", "Name", currencyUnitID);
+            ViewData["CurrencyUnitID"] = _currencyUnitRepository.GetSelectList(currencyUnitID);
             return View(editPerson);
         }
 
@@ -167,10 +168,7 @@ namespace MyAccounting.Controllers
                 return NotFound();
             }
 
-            var person = await _context.People
-                .Include(p => p.CurrencyUnit)
-                .Include(p => p.User)
-                .FirstOrDefaultAsync(m => m.PersonID == id);
+            var person = await _accountPartyRepository.GetByIdAsync(id.Value);
             if (person == null)
             {
                 return NotFound();
@@ -195,19 +193,8 @@ namespace MyAccounting.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            var person = await _context.People.FindAsync(id);
-            if (person != null)
-            {
-                _context.People.Remove(person);
-            }
-
-            await _context.SaveChangesAsync();
+            _ = await _accountPartyRepository.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool PersonExists(Guid id)
-        {
-            return _context.People.Any(e => e.PersonID == id);
         }
     }
 }
