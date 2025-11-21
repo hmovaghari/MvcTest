@@ -17,8 +17,13 @@ namespace MyAccounting.Data.Model
         public string Salt2 { get; set; } = string.Empty;
         public bool IsActive { get; set; } = true;
         public bool IsAdmin { get; set; } = false;
+        public Guid? ApiKeyID { get; set; }
 
         public ICollection<SettingKey>? SettingKeys { get; }
+
+        public ICollection<ApiKey>? ApiKeys { get; }
+
+        public ApiKey? ApiKey { get; }
 
         public User()
         {

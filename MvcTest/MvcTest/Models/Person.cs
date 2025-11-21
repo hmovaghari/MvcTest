@@ -18,9 +18,11 @@ namespace MyAccounting.Data.Model
         public string? BankCard { get; set; } = string.Empty;
         public string? Description { get; set; } = string.Empty;
         public Guid? CurrencyUnitID { get; set; }
+        public Guid? ApiKeyID { get; set; }
         public User User { get; set; } = null!;
         public CurrencyUnit? CurrencyUnit { get; set; }
         public virtual ICollection<Transaction>? TransactionReceivers { get; set; }
         public virtual ICollection<Transaction>? TransactionPayers { get; set; }
+        public ApiKey? ApiKey { get; set; }
     }
 }

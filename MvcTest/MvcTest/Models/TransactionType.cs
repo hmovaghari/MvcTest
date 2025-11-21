@@ -10,9 +10,11 @@ namespace MyAccounting.Data.Model
         public Guid UserID { get; set; }
         public bool IsCost { get; set; }
         public string Name { get; set; } = string.Empty;
+        public Guid? ApiKeyID { get; set; }
         public User User { get; set; } = null!;
         public TransactionType? ParentTransactionType { get; set; }
         public ICollection<Transaction>? Transactions { get; }
         public ICollection<TransactionType>? TransactionTypes { get; }
+        public ApiKey? ApiKey { get; set; }
     }
 }

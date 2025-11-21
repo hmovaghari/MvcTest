@@ -8,6 +8,8 @@ namespace MyAccounting.Data.Model
         public Guid CurrencyUnitID { get; set; }
         public string Name { get; set; } = string.Empty;
         public bool IsDesimal { get; set; }
+        public Guid? ApiKeyID { get; set; }
         public ICollection<Person>? Persons { get; set; }
+        public ApiKey? ApiKey { get; set; }
     }
 }

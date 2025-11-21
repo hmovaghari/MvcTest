@@ -13,9 +13,11 @@ namespace MyAccounting.Data.Model
         public DateTime Date { get; set; }
         public decimal Amount { get; set; }
         public string Description { get; set; } = string.Empty;
+        public Guid? ApiKeyID { get; set; }
         public TransactionType TransactionType { get; set; } = null!;
         public User User { get; set; } = null!;
         public Person? ReceiverPerson { get; set; }
         public Person? PayerPerson { get; set; }
+        public ApiKey? ApiKey { get; set; }
     }
 }

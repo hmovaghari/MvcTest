@@ -2,6 +2,7 @@
 using MyAccounting.Data;
 using MyAccounting.Data.Model;
 using MyAccounting.ViewModels;
+using System.Runtime.CompilerServices;
 
 namespace MyAccounting.Repository
 {
@@ -14,7 +15,7 @@ namespace MyAccounting.Repository
             _context = contex;
         }
 
-        public async Task<List<SettingValueDTO>?> GetsettingsValuesDTO(UserDTO user)
+        public async Task<List<SettingValueDTO>?> GetsettingsValuesDTO(UserDTO user, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -38,13 +39,13 @@ namespace MyAccounting.Repository
             }
             catch (Exception ex)
             {
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(SettingValueRepository), nameof(GetsettingsValuesDTO), user);
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(SettingValueRepository), nameof(GetsettingsValuesDTO), callerName, user);
             }
 
             return null;
         }
 
-        public async Task<bool?> AddOrUpdate(List<SettingValueDTO> settingValueDTOs)
+        public async Task<bool?> AddOrUpdate(List<SettingValueDTO> settingValueDTOs, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -81,7 +82,7 @@ namespace MyAccounting.Repository
             }
             catch (Exception ex)
             {
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(SettingValueRepository), nameof(AddOrUpdate), settingValueDTOs);
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(SettingValueRepository), nameof(AddOrUpdate), callerName, settingValueDTOs);
             }
 
             return null;

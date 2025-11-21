@@ -75,7 +75,7 @@ namespace MyAccounting.Controllers
 
         private async Task<bool> ControlData(Guid? personID, Guid userID, string name, Guid? oldCurrencyUnitID = null, Guid? newCurrencyUnitID = null)
         {
-            var controlData = await _accountPartyRepository.ControlData(personID, userID, name, oldCurrencyUnitID, newCurrencyUnitID);
+            var controlData = await _accountPartyRepository.ControlData(personID, userID, name, nameof(AccountsController), oldCurrencyUnitID, newCurrencyUnitID);
             if (controlData != null)
             {
                 ModelState.AddModelError(controlData.Value.Item1, controlData.Value.Item2);

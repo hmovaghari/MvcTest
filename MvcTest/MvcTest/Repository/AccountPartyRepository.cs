@@ -3,6 +3,7 @@ using MvcTest.ViewModels;
 using MyAccounting.Data;
 using MyAccounting.Data.Model;
 using MyAccounting.ViewModels;
+using System.Runtime.CompilerServices;
 
 namespace MyAccounting.Repository
 {
@@ -25,7 +26,7 @@ namespace MyAccounting.Repository
                 .ToListAsync();
         }
 
-        public async Task<List<PersonDTO>> GetPeople(Guid userId)
+        public async Task<List<PersonDTO>> GetPeople(Guid userId, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -47,13 +48,13 @@ namespace MyAccounting.Repository
             }
             catch (Exception ex)
             {
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(AccountPartyRepository), nameof(GetPeople), null);
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(AccountPartyRepository), nameof(GetPeople), callerName, null);
             }
 
             return new List<PersonDTO>();
         }
 
-        public async Task<List<AccountDTO>> GetAccounts(Guid userId)
+        public async Task<List<AccountDTO>> GetAccounts(Guid userId, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -74,13 +75,13 @@ namespace MyAccounting.Repository
             }
             catch (Exception ex)
             {
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(AccountPartyRepository), nameof(GetAccounts), null);
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(AccountPartyRepository), nameof(GetAccounts), callerName, null);
             }
 
             return new List<AccountDTO>();
         }
 
-        public async Task<(string, string)?> ControlData(Guid? personID, Guid userID, string name, Guid? oldCurrencyUnitID = null,
+        public async Task<(string, string)?> ControlData(Guid? personID, Guid userID, string name, [CallerMemberName] string callerName = "", Guid? oldCurrencyUnitID = null,
             Guid? newCurrencyUnitID = null)
         {
             try
@@ -102,7 +103,7 @@ namespace MyAccounting.Repository
             catch (Exception ex)
             {
                 var input = (personID, userID, name, oldCurrencyUnitID, newCurrencyUnitID);
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(AccountPartyRepository), nameof(ControlData), input);
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(AccountPartyRepository), nameof(ControlData), callerName, input);
                 return ("Name", "خطایی در بررسی داده‌ها رخ داده است");
             }
 
@@ -145,7 +146,7 @@ namespace MyAccounting.Repository
             };
         }
 
-        public async Task<bool> CreateAccountPartyAsync(AccountPartyDTO accountPartyDto, Guid userID, bool isPerson)
+        public async Task<bool> CreateAccountPartyAsync(AccountPartyDTO accountPartyDto, Guid userID, bool isPerson, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -177,12 +178,12 @@ namespace MyAccounting.Repository
             }
             catch (Exception ex)
             {
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(AccountPartyRepository), nameof(CreateAccountPartyAsync), (accountPartyDto, userID, isPerson));
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(AccountPartyRepository), nameof(CreateAccountPartyAsync), callerName, (accountPartyDto, userID, isPerson));
             }
             return false;
         }
 
-        public async Task<AccountPartyDTO> FindAsync(Guid? id)
+        public async Task<AccountPartyDTO> FindAsync(Guid? id, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -209,7 +210,7 @@ namespace MyAccounting.Repository
             }
             catch (Exception ex)
             {
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(AccountPartyRepository), nameof(FindAsync), id);
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(AccountPartyRepository), nameof(FindAsync), callerName, id);
             }
 
             return null;
@@ -254,7 +255,7 @@ namespace MyAccounting.Repository
             };
         }
 
-        public async Task<bool> EdiAsync(AccountPartyDTO accountPartyDto, bool isPerson)
+        public async Task<bool> EdiAsync(AccountPartyDTO accountPartyDto, bool isPerson, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -282,13 +283,13 @@ namespace MyAccounting.Repository
             }
             catch (Exception ex)
             {
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(AccountPartyRepository), nameof(EdiAsync), (accountPartyDto, isPerson));
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(AccountPartyRepository), nameof(EdiAsync), callerName, (accountPartyDto, isPerson));
             }
 
             return false;
         }
 
-        public async Task<AccountPartyDTO> GetByIdAsync(Guid id)
+        public async Task<AccountPartyDTO> GetByIdAsync(Guid id, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -320,12 +321,12 @@ namespace MyAccounting.Repository
             }
             catch (Exception ex)
             {
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(AccountPartyRepository), nameof(GetByIdAsync), id);
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(AccountPartyRepository), nameof(GetByIdAsync), callerName, id);
                 return null;
             }
         }
 
-        public async Task<bool> DeleteAsync(Guid id)
+        public async Task<bool> DeleteAsync(Guid id, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -339,7 +340,7 @@ namespace MyAccounting.Repository
             }
             catch (Exception ex)
             {
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(AccountPartyRepository), nameof(DeleteAsync), id);
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(AccountPartyRepository), nameof(DeleteAsync), callerName, id);
             }
             return false;
         }

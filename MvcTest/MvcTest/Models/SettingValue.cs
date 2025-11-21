@@ -9,7 +9,9 @@ namespace MyAccounting.Data.Model
         public Guid SettingKeyID { get; set; }
         public Guid UserID { get; set; }
         public string Value { get; set; } = string.Empty;
+        public Guid? ApiKeyID { get; set; }
         public SettingKey SettingKey { get; set; } = null!;
         public User User { get; set; } = null!;
+        public ApiKey? ApiKey { get; set; }
     }
 }

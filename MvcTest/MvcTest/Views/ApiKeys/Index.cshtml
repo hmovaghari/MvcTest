@@ -1,0 +1,54 @@
+﻿@model IEnumerable<MyAccounting.ViewModels.ApiKeyDTO>
+
+@{
+    ViewData["Title"] = "مدیریت وب‌سرویس";
+}
+
+<h1>کلیدهای وب‌سرویس</h1>
+
+<p>
+    <a asp-action="Create">ایجاد کلید وب‌سرویس جدید</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ApiKeyID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserDto)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsActive)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsAdmin)
+            </th>
+            <th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ApiKeyID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserDto.Username)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsActive)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsAdmin)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ApiKeyID">ویرایش</a> |
+                    <a asp-action="Delete" asp-route-id="@item.ApiKeyID">حذف</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

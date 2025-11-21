@@ -22,9 +22,6 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">خانه</a>
-                        </li>
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
@@ -49,6 +46,7 @@
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                         <li><a class="dropdown-item" asp-controller="Users" asp-action="Index">مدیریت کاربران</a></li>
+                                        <li><a class="dropdown-item" asp-controller="ApiKeys" asp-action="Index">مدیریت وب‌سرویس</a></li>
                                     </ul>
                                 </li>
                             }

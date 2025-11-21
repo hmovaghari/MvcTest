@@ -17,6 +17,7 @@ namespace MyAccounting.Data
         public DbSet<CurrencyUnit> CurrencyUnits { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<TransactionType> TransactionTypes { get; set; }
+        public DbSet<ApiKey> ApiKeys { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -33,6 +34,24 @@ namespace MyAccounting.Data
                 .WithMany(p => p.TransactionReceivers)         // هر شخص چند تراکنش دریافتی دارد
                 .HasForeignKey(t => t.ReceiverPersonID)        // کلید خارجی
                 .OnDelete(DeleteBehavior.Restrict);            // جلوگیری از حذف آبشاری
+
+            // --- ApiKey / User relationships (explicitly configured to remove ambiguity) ---
+
+            // 1) ApiKey owner relationship:
+            //    ApiKey.User (owner) <-> User.ApiKeys (owned keys)
+            modelBuilder.Entity<ApiKey>()
+                .HasOne(a => a.User)
+                .WithMany(u => u.ApiKeys)
+                .HasForeignKey(a => a.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // 2) ApiKey creator relationship:
+            //    User.ApiKey (creator) <-> ApiKey.Users (users created by that ApiKey)
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.ApiKey)
+                .WithMany(a => a.Users)
+                .HasForeignKey(u => u.ApiKeyID)
+                .OnDelete(DeleteBehavior.SetNull);
 
             //کاربر مدیریت پیشفرض
             modelBuilder.Entity<User>().HasData(

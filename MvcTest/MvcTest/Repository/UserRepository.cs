@@ -4,6 +4,8 @@ using MyAccounting.Data.Model;
 using MyAccounting.ViewModels;
 using System.Security.Cryptography;
 using System.Text;
+using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MyAccounting.Repository
 {
@@ -16,30 +18,53 @@ namespace MyAccounting.Repository
             _context = contex;
         }
 
-        public async Task<List<UserDTO>> GetAllUsersAsync()
+        public async Task<List<UserDTO>> GetAllUsersAsync([CallerMemberName] string callerName = "")
         {
             try
             {
                 var users = await _context.Users.ToListAsync();
-                var userDTOs = users.Select(x => new UserDTO()
-                {
-                    UserID = x.UserID,
-                    Username = x.Username,
-                    Email = x.Email,
-                    IsActive = x.IsActive,
-                    IsAdmin = x.IsAdmin,
-                }).ToList();
+                var userDTOs = users.Select(x => MapToDto(x)).ToList();
                 return userDTOs;
             }
             catch (Exception ex)
             {
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(GetAllUsersAsync), null);
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(GetAllUsersAsync), callerName, null);
             }
 
             return new List<UserDTO>();
         }
 
-        public async Task<bool> CreateUserAsync(CreateUser createUser)
+        public SelectList GetSelectList(Guid? userID = null)
+        {
+            return new SelectList(_context.Users, "UserID", "Username", userID);
+        }
+
+        public UserDTO MapToDto(User user, [CallerMemberName] string callerName = "")
+        {
+            try
+            {
+                if (user == null)
+                {
+                    return null;
+                }
+                return new UserDTO()
+                {
+                    UserID = user.UserID,
+                    Username = user.Username,
+                    Email = user.Email,
+                    IsActive = user.IsActive,
+                    IsAdmin = user.IsAdmin,
+                };
+            }
+            catch (Exception ex)
+            {
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(MapToDto), callerName, null);
+            }
+
+            return null;
+        }
+
+        public async Task<bool> CreateUserAsync(CreateUser createUser, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -61,7 +86,7 @@ namespace MyAccounting.Repository
             catch (Exception ex)
             {
                 ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(CreateUserAsync),
-                    createUser);
+                    callerName, createUser);
             }
 
             return false;
@@ -77,7 +102,7 @@ namespace MyAccounting.Repository
             return hashString;
         }
 
-        public async Task<(string, string)?> ControllData(Guid? userID, string username, string email)
+        public async Task<(string, string)?> ControllData(Guid? userID, string username, string email, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -99,12 +124,12 @@ namespace MyAccounting.Repository
             catch (Exception ex)
             {
                 var input = (userID, username, email);
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(ControllData), input);
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(ControllData), callerName, input);
                 return ("Username", "خطایی در بررسی داده‌ها رخ داده است");
             }
         }
 
-        public async Task<UserDTO?> FindAsync(Guid? id)
+        public async Task<UserDTO?> FindAsync(Guid? id, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -123,13 +148,13 @@ namespace MyAccounting.Repository
             }
             catch (Exception ex)
             {
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(FindAsync), id);
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(FindAsync), callerName, id);
             }
 
             return null;
         }
 
-        public async Task<bool> Edit(Guid id, EditUser editUser)
+        public async Task<bool> Edit(Guid id, EditUser editUser, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -154,12 +179,12 @@ namespace MyAccounting.Repository
             }
             catch (Exception ex)
             {
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(Edit), (id, editUser));
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(Edit), callerName, (id, editUser));
                 return false;
             }
         }
 
-        public async Task<UserDTO?> GetById(Guid id)
+        public async Task<UserDTO?> GetById(Guid id, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -180,12 +205,12 @@ namespace MyAccounting.Repository
             }
             catch (Exception ex)
             {
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(GetById), id);
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(GetById), callerName, id);
                 return null;
             }
         }
 
-        public async Task<bool> Delete(Guid id)
+        public async Task<bool> Delete(Guid id, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -199,13 +224,13 @@ namespace MyAccounting.Repository
             }
             catch (Exception ex)
             {
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(Delete), id);
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(Delete), callerName, id);
             }
 
             return false;
         }
 
-        public async Task<(bool?, UserDTO?)> CheckPassword(LoginViewModel model)
+        public async Task<(bool?, UserDTO?)> CheckPassword(LoginViewModel model, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -230,13 +255,13 @@ namespace MyAccounting.Repository
             }
             catch (Exception ex)
             {
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(CheckPassword), nameof(Delete), model);
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(CheckPassword), nameof(CheckPassword), callerName, model);
             }
 
             return (null, null);
         }
 
-        public async Task<UserDTO?> GetUserByUsername(string username)
+        public async Task<UserDTO?> GetUserByUsername(string username, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -252,7 +277,7 @@ namespace MyAccounting.Repository
             }
             catch (Exception ex)
             {
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(GetUserByUsername), username);
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(GetUserByUsername), callerName, username);
             }
             return null;
         }
