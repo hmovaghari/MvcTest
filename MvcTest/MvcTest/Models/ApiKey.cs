@@ -1,5 +1,8 @@
-﻿namespace MyAccounting.Data.Model
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace MyAccounting.Data.Model
 {
+    [Table("ApiKey")]
     public class ApiKey
     {
         public Guid ApiKeyID { get; set; } = Guid.NewGuid();
