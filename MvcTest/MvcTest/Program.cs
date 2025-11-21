@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using MyAccounting.Data;
-using System.Reflection;
+using MyAccounting.Middleware;
 
 namespace MvcTest
 {
@@ -29,6 +29,13 @@ namespace MvcTest
                     options.AccessDeniedPath = "/Home/Index";
                 });
 
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
             // Swagger
             builder.Services.AddSwaggerGen(c =>
             {
@@ -49,21 +56,24 @@ namespace MvcTest
                 app.UseHsts();
             }
 
-            // Swagger
-            // Configure the HTTP request pipeline.
-            //if (app.Environment.IsDevelopment())
-            //{
-            app.UseSwagger();
-            app.UseSwaggerUI();
-            //}
-
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
 
+            // فعال‌سازی Session - باید قبل از Authentication باشد
+            app.UseSession();
+
             app.UseAuthentication();
             app.UseAuthorization();
+
+            // Swagger با محافظت API Key
+            //if (app.Environment.IsDevelopment())
+            //{
+            app.UseMiddleware<SwaggerAuthMiddleware>();
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            //}
 
             app.MapControllerRoute(
                 name: "default",
