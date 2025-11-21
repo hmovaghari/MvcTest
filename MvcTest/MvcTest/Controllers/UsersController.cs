@@ -177,7 +177,7 @@ namespace MyAccounting.Controllers
 
                 if (await ControllData(editUser.UserID, editUser.Username, editUser.Email))
                 {
-                    if (await _userRepository.Edit(id, editUser))
+                    if (await _userRepository.EditAsync(id, editUser))
                     {
                         return RedirectToAction(nameof(Index));
                     }
@@ -219,7 +219,7 @@ namespace MyAccounting.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            _ = await _userRepository.Delete(id);
+            _ = await _userRepository.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
     }

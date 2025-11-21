@@ -1,6 +1,7 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using MyAccounting.Data;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Reflection;
 
 namespace MvcTest
 {
@@ -28,6 +29,16 @@ namespace MvcTest
                     options.AccessDeniedPath = "/Home/Index";
                 });
 
+            // Swagger
+            builder.Services.AddSwaggerGen(c =>
+            {
+
+                //// Set the comments path for the Swagger JSON and UI.
+                //var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                //c.IncludeXmlComments(xmlPath);
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -37,6 +48,14 @@ namespace MvcTest
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            // Swagger
+            // Configure the HTTP request pipeline.
+            //if (app.Environment.IsDevelopment())
+            //{
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            //}
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

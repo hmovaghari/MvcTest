@@ -81,6 +81,7 @@ namespace MyAccounting.Repository
                 user.Password = GenerateHashedPassword(createUser.Password, user.Salt1, user.Salt2);
                 _context.Add(user);
                 await _context.SaveChangesAsync();
+                createUser.UserID = user.UserID;
                 return true;
             }
             catch (Exception ex)
@@ -154,7 +155,7 @@ namespace MyAccounting.Repository
             return null;
         }
 
-        public async Task<bool> Edit(Guid id, EditUser editUser, [CallerMemberName] string callerName = "")
+        public async Task<bool> EditAsync(Guid id, EditUser editUser, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -179,7 +180,7 @@ namespace MyAccounting.Repository
             }
             catch (Exception ex)
             {
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(Edit), callerName, (id, editUser));
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(EditAsync), callerName, (id, editUser));
                 return false;
             }
         }
@@ -210,7 +211,7 @@ namespace MyAccounting.Repository
             }
         }
 
-        public async Task<bool> Delete(Guid id, [CallerMemberName] string callerName = "")
+        public async Task<bool> DeleteAsync(Guid id, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -224,7 +225,7 @@ namespace MyAccounting.Repository
             }
             catch (Exception ex)
             {
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(Delete), callerName, id);
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(DeleteAsync), callerName, id);
             }
 
             return false;

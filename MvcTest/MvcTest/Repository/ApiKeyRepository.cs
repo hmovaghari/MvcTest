@@ -132,16 +132,72 @@ namespace MyAccounting.Repository
             return false;
         }
 
-        private ApiKeyDTO MapToDto(ApiKey apiKey)
+        private ApiKeyDTO MapToDto(ApiKey apiKey, [CallerMemberName] string callerName = "")
         {
-            return new ApiKeyDTO()
+            try
             {
-                ApiKeyID = apiKey.ApiKeyID,
-                UserID = apiKey.UserID,
-                IsActive = apiKey.IsActive,
-                IsAdmin = apiKey.IsAdmin,
-                UserDto = _userRepository.MapToDto(apiKey.User)
-            };
+                if (apiKey == null)
+                {
+                    return null;
+                }
+                return new ApiKeyDTO()
+                {
+                    ApiKeyID = apiKey.ApiKeyID,
+                    UserID = apiKey.UserID,
+                    IsActive = apiKey.IsActive,
+                    IsAdmin = apiKey.IsAdmin,
+                    UserDto = _userRepository.MapToDto(apiKey.User)
+                };
+            }
+            catch (Exception ex)
+            {
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(ApiKeyRepository), nameof(MapToDto),
+                    callerName, null);
+            }
+
+            return null;
+        }
+
+        public async Task<bool> IsValidApiKeyAsync(string apiKey, [CallerMemberName] string callerName = "")
+        {
+            try
+            {
+                var isPars = Guid.TryParse(apiKey, out Guid _apiKey);
+                if (isPars)
+                {
+                    return _context.ApiKeys.Any(ak => ak.ApiKeyID == _apiKey && ak.IsActive);
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(ApiKeyRepository), nameof(IsValidApiKeyAsync),
+                    callerName, apiKey);
+            }
+
+            return false;
+        }
+
+        public async Task<bool> IsValidAdminApiKeyAsync(string apiKey, [CallerMemberName] string callerName = "")
+        {
+            try
+            {
+                var isPars = Guid.TryParse(apiKey, out Guid _apiKey);
+                if (isPars)
+                {
+                    return await _context.ApiKeys.AnyAsync(ak => ak.ApiKeyID == _apiKey && ak.IsActive && ak.IsAdmin);
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(ApiKeyRepository), nameof(IsValidAdminApiKeyAsync),
+                    callerName, apiKey);
+            }
+
+            return false;
         }
     }
 }
