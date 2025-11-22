@@ -20,3 +20,192 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/* ===== Theme System ===== */
+
+/* Light Theme (Default) */
+:root[data-theme="light"],
+:root:not([data-theme]) {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --border-color: #dee2e6;
+  --navbar-bg: #ffffff;
+  --navbar-text: #212529;
+  --table-bg: #ffffff;
+  --table-border: #dee2e6;
+  --input-bg: #ffffff;
+  --input-border: #dee2e6;
+  --input-text: #212529;
+  --footer-bg: #f8f9fa;
+  --footer-text: #6c757d;
+  --alert-bg: #f8f9fa;
+  --card-bg: #ffffff;
+  --card-border: #dee2e6;
+}
+
+/* Dark Theme */
+:root[data-theme="dark"] {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --text-primary: #e4e4e7;
+  --text-secondary: #a1a1a6;
+  --border-color: #404040;
+  --navbar-bg: #212121;
+  --navbar-text: #e4e4e7;
+  --table-bg: #2d2d2d;
+  --table-border: #404040;
+  --input-bg: #2d2d2d;
+  --input-border: #404040;
+  --input-text: #e4e4e7;
+  --footer-bg: #212121;
+  --footer-text: #a1a1a6;
+  --alert-bg: #2d2d2d;
+  --card-bg: #2d2d2d;
+  --card-border: #404040;
+}
+
+/* Apply Theme Colors */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Navbar */
+.navbar {
+  background-color: var(--navbar-bg) !important;
+  border-bottom-color: var(--border-color) !important;
+}
+
+.navbar-light .navbar-brand,
+.navbar-light .nav-link {
+  color: var(--navbar-text) !important;
+}
+
+.navbar-light .nav-link:hover,
+.navbar-light .nav-link:focus {
+  color: var(--text-secondary) !important;
+}
+
+/* Text colors */
+.text-dark {
+  color: var(--text-primary) !important;
+}
+
+.text-muted {
+  color: var(--text-secondary) !important;
+}
+
+/* Forms */
+.form-control,
+.form-select {
+  background-color: var(--input-bg) !important;
+  border-color: var(--input-border) !important;
+  color: var(--input-text) !important;
+}
+
+.form-control::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--input-bg) !important;
+  color: var(--input-text) !important;
+  border-color: #258cfb !important;
+  box-shadow: 0 0 0 0.25rem rgba(37, 140, 251, 0.25);
+}
+
+/* Tables */
+.table {
+  background-color: var(--table-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+.table th,
+.table td {
+  border-color: var(--table-border) !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: var(--bg-secondary) !important;
+}
+
+.table-light {
+  background-color: var(--bg-secondary) !important;
+}
+
+.table-dark {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Cards */
+.card {
+  background-color: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Footer */
+.footer {
+  background-color: var(--footer-bg) !important;
+  color: var(--footer-text) !important;
+  border-top-color: var(--border-color) !important;
+}
+
+/* Alerts */
+.alert {
+  background-color: var(--alert-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: var(--navbar-text);
+  transition: transform 0.2s;
+}
+
+.theme-toggle-btn:hover {
+  transform: scale(1.1);
+}
+
+/* Labels */
+.form-label {
+  color: var(--text-primary) !important;
+}
+
+/* Dropdown */
+.dropdown-menu {
+  background-color: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+}
+
+.dropdown-item {
+  color: var(--text-primary) !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Main container */
+main {
+  background-color: var(--bg-primary) !important;
+}
+
+/* Container */
+.container {
+  color: var(--text-primary) !important;
+}
