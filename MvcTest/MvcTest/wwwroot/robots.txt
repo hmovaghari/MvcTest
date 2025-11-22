@@ -1,0 +1,5 @@
+﻿User-Agent: *
+Disallow: /
+Allow: /$
+Allow: /Home/Index$
+Sitemap: https://accounting.weapps.ir/sitemap.xml
