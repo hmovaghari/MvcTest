@@ -155,6 +155,30 @@ namespace MyAccounting.Repository
             return null;
         }
 
+        public async Task<bool> ChangeAsync(Guid id, ChangeUser changeUser, [CallerMemberName] string callerName = "")
+        {
+            try
+            {
+                var user = await _context.Users.FindAsync(id);
+                if (user == null)
+                {
+                    return false;
+                }
+
+                user.IsActive = changeUser.IsActive;
+                user.IsAdmin = changeUser.IsAdmin;
+                
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(ChangeAsync), callerName, (id, changeUser));
+                return false;
+            }
+        }
+
         public async Task<bool> EditAsync(Guid id, EditUser editUser, [CallerMemberName] string callerName = "")
         {
             try

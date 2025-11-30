@@ -128,6 +128,62 @@ namespace MyAccounting.Controllers
             return true;
         }
 
+        // GET: Users/Change/5
+        [Authorize]
+        public async Task<IActionResult> Change(Guid? id)
+        {
+            if (id == null)
+            {
+                return RedirectToMainPage();
+            }
+
+            var user = await _userRepository.FindAsync(id);
+            var currentUser = await GetCurrentUser();
+
+            if (user == null || !(currentUser?.IsAdmin ?? false))
+            {
+                return RedirectToMainPage();
+            }
+
+            var changeUser = new ChangeUser()
+            {
+                UserID = user.UserID,
+                IsActive = user.IsActive,
+                IsAdmin = user.IsAdmin,
+            };
+
+            return View(changeUser);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Change(Guid id, [Bind("UserID,IsActive,IsAdmin")] ChangeUser changeUser)
+        {
+            if (id != changeUser.UserID)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                var user = await _userRepository.FindAsync(id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                if (await _userRepository.ChangeAsync(id, changeUser))
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    return View(changeUser);
+                }
+            }
+            return View(changeUser);
+        }
+
         // GET: Users/Edit/5
         [Authorize]
         public async Task<IActionResult> Edit(Guid? id)
@@ -140,7 +196,7 @@ namespace MyAccounting.Controllers
             var user = await _userRepository.FindAsync(id);
             var currentUser = await GetCurrentUser();
             
-            if (user == null || currentUser == null || (!currentUser.IsAdmin && currentUser.UserID != user.UserID))
+            if (user == null || currentUser == null || (currentUser.UserID != user.UserID))
             {
                 return RedirectToMainPage();
             }
