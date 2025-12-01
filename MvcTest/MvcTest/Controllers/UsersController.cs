@@ -105,7 +105,7 @@ namespace MyAccounting.Controllers
                 if (await ControllData(userID: null, createUser.Username, createUser.Email))
                 {
 
-                    if (await _userRepository.CreateUserAsync(createUser))
+                    if (await _userRepository.CreateUserAsync(createUser, apiKey: null))
                     {
                         return RedirectToAction(nameof(Index));
                     }
@@ -172,7 +172,7 @@ namespace MyAccounting.Controllers
                     return NotFound();
                 }
 
-                if (await _userRepository.ChangeAsync(id, changeUser))
+                if (await _userRepository.ChangeAsync(id, changeUser, apiKey: null))
                 {
                     return RedirectToAction(nameof(Index));
                 }
@@ -233,7 +233,7 @@ namespace MyAccounting.Controllers
 
                 if (await ControllData(editUser.UserID, editUser.Username, editUser.Email))
                 {
-                    if (await _userRepository.EditAsync(id, editUser))
+                    if (await _userRepository.EditAsync(id, editUser, apiKey: null))
                     {
                         return RedirectToAction(nameof(Index));
                     }

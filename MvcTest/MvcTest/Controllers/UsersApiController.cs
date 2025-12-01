@@ -138,7 +138,7 @@ namespace MvcTest.Controllers
                 return NotFound();
             }
 
-            if (await _userRepository.EditAsync(id, editUser))
+            if (await _userRepository.EditAsync(id, editUser, apiKey))
             {
                 return Ok();
             }
@@ -159,7 +159,7 @@ namespace MvcTest.Controllers
                 return BadRequest();
             }
 
-            if (await _userRepository.CreateUserAsync(createUser))
+            if (await _userRepository.CreateUserAsync(createUser, apiKey))
             {
                 return CreatedAtAction("GetUser", new { id = createUser.UserID }, createUser);
             }

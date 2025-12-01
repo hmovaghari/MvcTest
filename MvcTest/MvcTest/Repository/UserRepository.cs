@@ -64,7 +64,7 @@ namespace MyAccounting.Repository
             return null;
         }
 
-        public async Task<bool> CreateUserAsync(CreateUser createUser, [CallerMemberName] string callerName = "")
+        public async Task<bool> CreateUserAsync(CreateUser createUser, string apiKey, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -79,6 +79,10 @@ namespace MyAccounting.Repository
                     IsAdmin = false
                 };
                 user.Password = GenerateHashedPassword(createUser.Password, user.Salt1, user.Salt2);
+                if (apiKey != null)
+                {
+                    user.ApiKeyID = Guid.Parse(apiKey);
+                }
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 createUser.UserID = user.UserID;
@@ -155,7 +159,7 @@ namespace MyAccounting.Repository
             return null;
         }
 
-        public async Task<bool> ChangeAsync(Guid id, ChangeUser changeUser, [CallerMemberName] string callerName = "")
+        public async Task<bool> ChangeAsync(Guid id, ChangeUser changeUser, string apiKey, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -167,7 +171,12 @@ namespace MyAccounting.Repository
 
                 user.IsActive = changeUser.IsActive;
                 user.IsAdmin = changeUser.IsAdmin;
-                
+
+                if (apiKey != null)
+                {
+                    user.ApiKeyID = Guid.Parse(apiKey);
+                }
+
                 _context.Update(user);
                 await _context.SaveChangesAsync();
                 return true;
@@ -179,7 +188,7 @@ namespace MyAccounting.Repository
             }
         }
 
-        public async Task<bool> EditAsync(Guid id, EditUser editUser, [CallerMemberName] string callerName = "")
+        public async Task<bool> EditAsync(Guid id, EditUser editUser, string apiKey, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -196,6 +205,11 @@ namespace MyAccounting.Repository
                     user.Salt1 = Guid.NewGuid().ToString();
                     user.Salt2 = Guid.NewGuid().ToString();
                     user.Password = GenerateHashedPassword(editUser.NewPassword, user.Salt1, user.Salt2);
+                }
+
+                if (apiKey != null)
+                {
+                    user.ApiKeyID = Guid.Parse(apiKey);
                 }
 
                 _context.Update(user);
