@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using MyAccounting.Data;
-using MyAccounting.Data.Model;
 
 namespace MyAccounting.Repository
 {

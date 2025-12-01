@@ -4,9 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MyAccounting.Data;
-using MyAccounting.Data.Model;
 using MyAccounting.Repository;
 using MyAccounting.ViewModels;
 
@@ -16,13 +14,11 @@ namespace MvcTest.Controllers
     [ApiController]
     public class UsersApiController : ControllerBase
     {
-        private readonly SqlDBContext _context;
         private readonly UserRepository _userRepository;
         private readonly ApiKeyRepository _apiKeyRepository;
 
         public UsersApiController(SqlDBContext context) //: base(context)
         {
-            _context = context;
             _userRepository = new UserRepository(context);
             _apiKeyRepository = new ApiKeyRepository(context);
         }

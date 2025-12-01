@@ -1,8 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MyAccounting.Data;
-using MyAccounting.Data.Model;
-using System.Threading.Tasks;
 using MyAccounting.Repository;
 using MyAccounting.ViewModels;
 

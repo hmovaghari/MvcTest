@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
-
-namespace MyAccounting.Middleware
+﻿namespace MyAccounting.Middleware
 {
     public class SwaggerAuthMiddleware
     {
