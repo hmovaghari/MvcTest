@@ -27,7 +27,7 @@ namespace MvcTest.Controllers
         [Route("Login")]
         public async Task<ActionResult<bool>> Login(string apiKey, LoginViewModel loginViewModel)
         {
-            if (!!await _apiKeyRepository.IsValidAdminApiKeyAsync(apiKey))
+            if (!await _apiKeyRepository.IsValidApiKeyAsync(apiKey))
             {
                 return BadRequest();
             }
@@ -60,7 +60,7 @@ namespace MvcTest.Controllers
         }
 
         // GET: api/UsersApi/5
-        [HttpGet]
+        [HttpPost]
         [Route("GetUser")]
         public async Task<ActionResult<UserDTO>> GetUser(string apiKey, GUID id)
         {
@@ -84,7 +84,64 @@ namespace MvcTest.Controllers
             return userDto;
         }
 
-        [HttpGet]
+        [HttpPost]
+        [Route("BeforChange")]
+        public async Task<ActionResult<ChangeUser>> BeforChange(string apiKey, GUID id)
+        {
+            if (!await _apiKeyRepository.IsValidAdminApiKeyAsync(apiKey))
+            {
+                return BadRequest();
+            }
+
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
+            var userDto = await _userRepository.FindAsync(id.ID);
+
+            if (userDto != null)
+            {
+                return new ChangeUser()
+                {
+                    UserID = id.ID,
+                    IsActive = userDto.IsActive,
+                    IsAdmin = userDto.IsAdmin,
+                };
+            }
+
+            return null;
+        }
+
+        // PUT: api/UsersApi/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut]
+        [Route("ChangeUser")]
+        public async Task<IActionResult> changeUser(string apiKey, Guid id, ChangeUser changeUser)
+        {
+            if (!await _apiKeyRepository.IsValidAdminApiKeyAsync(apiKey))
+            {
+                return BadRequest();
+            }
+
+            var userDto = await _userRepository.GetById(id);
+
+            if (changeUser == null || userDto == null || !userDto.IsAdmin)
+            {
+                return BadRequest();
+            }
+
+            if (await _userRepository.ChangeAsync(id, changeUser, apiKey))
+            {
+                return Ok();
+            }
+            else
+            {
+                return Problem();
+            }
+        }
+
+        [HttpPost]
         [Route("BeforEdit")]
         public async Task<ActionResult<EditUser>> BeforEdit(string apiKey, GUID id)
         {
@@ -150,7 +207,7 @@ namespace MvcTest.Controllers
         [Route("CreateUser")]
         public async Task<ActionResult<UserDTO>?> CreateUser(string apiKey, CreateUser createUser)
         {
-            if (!await _apiKeyRepository.IsValidAdminApiKeyAsync(apiKey))
+            if (!await _apiKeyRepository.IsValidApiKeyAsync(apiKey))
             {
                 return BadRequest();
             }
@@ -168,7 +225,7 @@ namespace MvcTest.Controllers
         // DELETE: api/UsersApi/5
         [HttpDelete]
         [Route("DeleteUser")]
-        public async Task<IActionResult> DeleteUser(string apiKey, GUID id)
+        public async Task<IActionResult> DeleteUser(string apiKey, Guid currentUserID, GUID id)
         {
             if (!await _apiKeyRepository.IsValidAdminApiKeyAsync(apiKey))
             {
@@ -180,7 +237,14 @@ namespace MvcTest.Controllers
                 return BadRequest();
             }
 
-            if (_userRepository.FindAsync(id.ID) == null)
+            var currentUser = await _userRepository.GetById(currentUserID);
+
+            if (currentUser == null || !currentUser.IsAdmin)
+            {
+                return BadRequest();
+            }
+
+            if (await _userRepository.FindAsync(id.ID) == null)
             {
                 return NotFound();
             }

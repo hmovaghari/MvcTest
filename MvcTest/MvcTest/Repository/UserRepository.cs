@@ -163,7 +163,7 @@ namespace MyAccounting.Repository
         {
             try
             {
-                var user = await _context.Users.FindAsync(id);
+                var user = await _context.Users.FindAsync(changeUser.UserID);
                 if (user == null)
                 {
                     return false;

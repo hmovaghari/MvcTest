@@ -152,6 +152,8 @@ namespace MyAccounting.Controllers
                 IsAdmin = user.IsAdmin,
             };
 
+            ViewBag.Username = user.Username;
+
             return View(changeUser);
         }
 
