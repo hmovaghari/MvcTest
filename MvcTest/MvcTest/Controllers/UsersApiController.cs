@@ -92,7 +92,7 @@ namespace MvcTest.Controllers
         [Route("BeforEdit")]
         public async Task<ActionResult<EditUser>> BeforEdit(string apiKey, GUID id)
         {
-            if (!await _apiKeyRepository.IsValidAdminApiKeyAsync(apiKey))
+            if (!await _apiKeyRepository.IsValidApiKeyAsync(apiKey))
             {
                 return BadRequest();
             }
@@ -123,7 +123,7 @@ namespace MvcTest.Controllers
         [Route("EditUser")]
         public async Task<IActionResult> EditUser(string apiKey, Guid id, EditUser editUser)
         {
-            if (!await _apiKeyRepository.IsValidAdminApiKeyAsync(apiKey))
+            if (!await _apiKeyRepository.IsValidApiKeyAsync(apiKey))
             {
                 return BadRequest();
             }
