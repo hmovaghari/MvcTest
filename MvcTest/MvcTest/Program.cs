@@ -67,6 +67,9 @@ namespace MvcTest
             app.UseAuthentication();
             app.UseAuthorization();
 
+            // API Key Validation Middleware - قبل از Swagger
+            app.UseApiKeyValidation();
+
             // Swagger با محافظت API Key
             //if (app.Environment.IsDevelopment())
             //{

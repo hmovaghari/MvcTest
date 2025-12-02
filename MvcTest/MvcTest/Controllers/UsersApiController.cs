@@ -27,11 +27,6 @@ namespace MvcTest.Controllers
         [Route("Login")]
         public async Task<ActionResult<bool>> Login(string apiKey, LoginViewModel loginViewModel)
         {
-            if (!await _apiKeyRepository.IsValidApiKeyAsync(apiKey))
-            {
-                return BadRequest();
-            }
-
             if (loginViewModel == null)
             {
                 return BadRequest();
@@ -53,7 +48,7 @@ namespace MvcTest.Controllers
         {
             if (!await _apiKeyRepository.IsValidAdminApiKeyAsync(apiKey))
             {
-                return BadRequest();
+                return Unauthorized();
             }
 
             return await _userRepository.GetAllUsersAsync(); //_context.Users.ToListAsync();
@@ -66,7 +61,7 @@ namespace MvcTest.Controllers
         {
             if (!await _apiKeyRepository.IsValidAdminApiKeyAsync(apiKey))
             {
-                return BadRequest();
+                return Unauthorized();
             }
 
             if (id == null)
@@ -90,7 +85,7 @@ namespace MvcTest.Controllers
         {
             if (!await _apiKeyRepository.IsValidAdminApiKeyAsync(apiKey))
             {
-                return BadRequest();
+                return Unauthorized();
             }
 
             if (id == null)
@@ -121,14 +116,19 @@ namespace MvcTest.Controllers
         {
             if (!await _apiKeyRepository.IsValidAdminApiKeyAsync(apiKey))
             {
-                return BadRequest();
+                return Unauthorized();
             }
 
             var userDto = await _userRepository.GetById(id);
 
-            if (changeUser == null || userDto == null || !userDto.IsAdmin)
+            if (changeUser == null || userDto == null)
             {
                 return BadRequest();
+            }
+
+            if (!userDto.IsAdmin)
+            {
+                return Unauthorized();
             }
 
             if (await _userRepository.ChangeAsync(id, changeUser, apiKey))
@@ -145,11 +145,6 @@ namespace MvcTest.Controllers
         [Route("BeforEdit")]
         public async Task<ActionResult<EditUser>> BeforEdit(string apiKey, GUID id)
         {
-            if (!await _apiKeyRepository.IsValidApiKeyAsync(apiKey))
-            {
-                return BadRequest();
-            }
-
             if (id == null)
             {
                 return BadRequest();
@@ -176,11 +171,6 @@ namespace MvcTest.Controllers
         [Route("EditUser")]
         public async Task<IActionResult> EditUser(string apiKey, Guid id, EditUser editUser)
         {
-            if (!await _apiKeyRepository.IsValidApiKeyAsync(apiKey))
-            {
-                return BadRequest();
-            }
-
             if (editUser == null || id != editUser.UserID)
             {
                 return BadRequest();
@@ -207,11 +197,6 @@ namespace MvcTest.Controllers
         [Route("CreateUser")]
         public async Task<ActionResult<UserDTO>?> CreateUser(string apiKey, CreateUser createUser)
         {
-            if (!await _apiKeyRepository.IsValidApiKeyAsync(apiKey))
-            {
-                return BadRequest();
-            }
-
             if (await _userRepository.CreateUserAsync(createUser, apiKey))
             {
                 return CreatedAtAction("GetUser", new { id = createUser.UserID }, createUser);
@@ -229,7 +214,7 @@ namespace MvcTest.Controllers
         {
             if (!await _apiKeyRepository.IsValidAdminApiKeyAsync(apiKey))
             {
-                return BadRequest();
+                return Unauthorized();
             }
 
             if (id == null)
@@ -239,9 +224,14 @@ namespace MvcTest.Controllers
 
             var currentUser = await _userRepository.GetById(currentUserID);
 
-            if (currentUser == null || !currentUser.IsAdmin)
+            if (currentUser == null)
             {
                 return BadRequest();
+            }
+
+            if (!currentUser.IsAdmin)
+            {
+                return Unauthorized();
             }
 
             if (await _userRepository.FindAsync(id.ID) == null)
