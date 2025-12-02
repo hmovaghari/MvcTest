@@ -24,6 +24,10 @@ namespace MvcTest
                     options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
                     options.SlidingExpiration = true;
                     options.Cookie.MaxAge = TimeSpan.FromDays(7);
+                    options.Cookie.HttpOnly = true;
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                    options.Cookie.SameSite = SameSiteMode.Strict;
+                    options.Cookie.Name = ".MyAccounting.Auth";
                     options.LoginPath = "/Users/Login";
                     options.LogoutPath = "/Users/Logout";
                     options.AccessDeniedPath = "/Home/Index";
@@ -33,6 +37,9 @@ namespace MvcTest
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
                 options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.SameSite = SameSiteMode.Strict;
+                options.Cookie.Name = ".MyAccounting.Session";
                 options.Cookie.IsEssential = true;
             });
 
