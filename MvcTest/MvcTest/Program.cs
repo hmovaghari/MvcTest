@@ -80,7 +80,7 @@ namespace MvcTest
             // Swagger با محافظت API Key
             //if (app.Environment.IsDevelopment())
             //{
-            app.UseMiddleware<SwaggerAuthMiddleware>();
+            app.UseSwaggerAuth();
             app.UseSwagger();
             app.UseSwaggerUI();
             //}

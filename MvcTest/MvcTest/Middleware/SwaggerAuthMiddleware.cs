@@ -43,4 +43,13 @@
             await _next(context);
         }
     }
+
+    // Extension method برای ثبت middleware
+    public static class SwaggerAuthMiddlewareExtensions
+    {
+        public static IApplicationBuilder UseSwaggerAuth(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<ApiKeyValidationMiddleware>();
+        }
+    }
 }
