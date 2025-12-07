@@ -1,5 +1,6 @@
 ﻿using MyAccounting.Data;
 using MyAccounting.Repository;
+using MyAccounting.ViewModels;
 
 namespace MyAccounting.Middleware
 {
@@ -23,14 +24,12 @@ namespace MyAccounting.Middleware
                 {
                     // ذخیره وضعیت احراز هویت در Session
                     context.Session.SetString("SwaggerAuthenticated", "true");
-                    context.Response.StatusCode = 200;
-                    await context.Response.WriteAsync("Success");
+                    await Response.WriteOkJsonAsync(context);
                     return;
                 }
                 else
                 {
-                    context.Response.StatusCode = 400;
-                    await context.Response.WriteAsync("Bad Request");
+                    await Response.WriteBadRequestJsonAsync(context);
                     return;
                 }
             }
@@ -44,8 +43,7 @@ namespace MyAccounting.Middleware
                 }
                 else
                 {
-                    context.Response.StatusCode = 401;
-                    await context.Response.WriteAsync("Unauthorized - Invalid API Key");
+                    await Response.WriteUnauthorizedJsonAsync(context);
                     return;
                 }
             }
@@ -57,7 +55,6 @@ namespace MyAccounting.Middleware
         }
     }
 
-    // Extension method برای ثبت middleware
     public static class SwaggerAuthMiddlewareExtensions
     {
         public static IApplicationBuilder UseSwaggerAuth(this IApplicationBuilder builder)

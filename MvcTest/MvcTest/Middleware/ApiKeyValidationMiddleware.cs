@@ -1,12 +1,12 @@
 ﻿using MyAccounting.Data;
 using MyAccounting.Repository;
+using MyAccounting.ViewModels;
 
 namespace MyAccounting.Middleware
 {
     public class ApiKeyValidationMiddleware
     {
         private readonly RequestDelegate _next;
-        private const string API_KEY_QUERY_PARAM = "apiKey";
 
         public ApiKeyValidationMiddleware(RequestDelegate next)
         {
@@ -23,26 +23,16 @@ namespace MyAccounting.Middleware
             }
 
             // استخراج apiKey از query string
-            if (!context.Request.Query.TryGetValue(API_KEY_QUERY_PARAM, out var apiKeyValues))
+            if (!context.Request.Query.TryGetValue("apiKey", out var apiKeyValues))
             {
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    success = false,
-                    message = "API Key is required. Please provide 'apiKey' in query string."
-                });
+                await Response.WriteUnauthorizedJsonAsync(context, "API Key is required");
                 return;
             }
 
             var apiKey = apiKeyValues.FirstOrDefault();
             if (string.IsNullOrWhiteSpace(apiKey))
             {
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    success = false,
-                    message = "API Key cannot be empty."
-                });
+                await Response.WriteUnauthorizedJsonAsync(context, "API Key cannot be empty");
                 return;
             }
 
@@ -52,12 +42,7 @@ namespace MyAccounting.Middleware
 
             if (!isValid)
             {
-                context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    success = false,
-                    message = "Invalid or inactive API Key."
-                });
+                await Response.WriteForbiddenJsonAsync(context, "Invalid or inactive API Key");
                 return;
             }
 
