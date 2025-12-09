@@ -44,11 +44,21 @@ namespace MvcTest.Controllers
         // GET: api/UsersApi
         [HttpGet]
         [Route("GetUsers")]
-        public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers(string apiKey)
+        public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers(string apiKey, Guid currentUserID)
         {
             if (!await _apiKeyRepository.IsValidAdminApiKeyAsync(apiKey))
             {
-                return Unauthorized();
+                return Forbid();
+            }
+
+            var currentUser = await _userRepository.GetById(currentUserID);
+            if (currentUser == null)
+            {
+                return BadRequest();
+            }
+            if (!currentUser.IsAdmin)
+            {
+                return Forbid();
             }
 
             return await _userRepository.GetAllUsersAsync(); //_context.Users.ToListAsync();
@@ -57,11 +67,21 @@ namespace MvcTest.Controllers
         // GET: api/UsersApi/5
         [HttpPost]
         [Route("GetUser")]
-        public async Task<ActionResult<UserDTO>> GetUser(string apiKey, GUID id)
+        public async Task<ActionResult<UserDTO>> GetUser(string apiKey, Guid currentUserID, GUID id)
         {
             if (!await _apiKeyRepository.IsValidAdminApiKeyAsync(apiKey))
             {
-                return Unauthorized();
+                return Forbid();
+            }
+
+            var currentUser = await _userRepository.GetById(currentUserID);
+            if (currentUser == null)
+            {
+                return BadRequest();
+            }
+            if (!currentUser.IsAdmin)
+            {
+                return Forbid();
             }
 
             if (id == null)
@@ -81,11 +101,21 @@ namespace MvcTest.Controllers
 
         [HttpPost]
         [Route("BeforChange")]
-        public async Task<ActionResult<ChangeUser>> BeforChange(string apiKey, GUID id)
+        public async Task<ActionResult<ChangeUser>> BeforChange(string apiKey, Guid currentUserID, GUID id)
         {
             if (!await _apiKeyRepository.IsValidAdminApiKeyAsync(apiKey))
             {
-                return Unauthorized();
+                return Forbid();
+            }
+
+            var currentUser = await _userRepository.GetById(currentUserID);
+            if (currentUser == null)
+            {
+                return BadRequest();
+            }
+            if (!currentUser.IsAdmin)
+            {
+                return Forbid();
             }
 
             if (id == null)
@@ -112,26 +142,29 @@ namespace MvcTest.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
         [Route("ChangeUser")]
-        public async Task<IActionResult> changeUser(string apiKey, Guid id, ChangeUser changeUser)
+        public async Task<IActionResult> changeUser(string apiKey, Guid currentUserID, ChangeUser changeUser)
         {
             if (!await _apiKeyRepository.IsValidAdminApiKeyAsync(apiKey))
             {
-                return Unauthorized();
+                return Forbid();
             }
 
-            var userDto = await _userRepository.GetById(id);
+            var currentUser = await _userRepository.GetById(currentUserID);
+            if (currentUser == null)
+            {
+                return BadRequest();
+            }
+            if (!currentUser.IsAdmin)
+            {
+                return Forbid();
+            }
 
-            if (changeUser == null || userDto == null)
+            if (changeUser == null)
             {
                 return BadRequest();
             }
 
-            if (!userDto.IsAdmin)
-            {
-                return Unauthorized();
-            }
-
-            if (await _userRepository.ChangeAsync(id, changeUser, apiKey))
+            if (await _userRepository.ChangeAsync(changeUser, apiKey))
             {
                 return Ok();
             }
@@ -143,11 +176,16 @@ namespace MvcTest.Controllers
 
         [HttpPost]
         [Route("BeforEdit")]
-        public async Task<ActionResult<EditUser>> BeforEdit(string apiKey, GUID id)
+        public async Task<ActionResult<EditUser>> BeforEdit(string apiKey, Guid currentUserID, GUID id)
         {
             if (id == null)
             {
                 return BadRequest();
+            }
+
+            if(currentUserID != id.ID)
+            {
+                return Forbid();
             }
 
             var userDto = await _userRepository.FindAsync(id.ID);
@@ -169,19 +207,24 @@ namespace MvcTest.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
         [Route("EditUser")]
-        public async Task<IActionResult> EditUser(string apiKey, Guid id, EditUser editUser)
+        public async Task<IActionResult> EditUser(string apiKey, Guid currentUserID, EditUser editUser)
         {
-            if (editUser == null || id != editUser.UserID)
+            if (editUser == null)
             {
                 return BadRequest();
             }
 
-            if (await _userRepository.FindAsync(id) == null)
+            if (currentUserID != editUser.UserID)
+            {
+                return Forbid();
+            }
+
+            if (await _userRepository.FindAsync(currentUserID) == null)
             {
                 return NotFound();
             }
 
-            if (await _userRepository.EditAsync(id, editUser, apiKey))
+            if (await _userRepository.EditAsync(editUser, apiKey))
             {
                 return Ok();
             }
@@ -214,24 +257,22 @@ namespace MvcTest.Controllers
         {
             if (!await _apiKeyRepository.IsValidAdminApiKeyAsync(apiKey))
             {
-                return Unauthorized();
+                return Forbid();
+            }
+
+            var currentUser = await _userRepository.GetById(currentUserID);
+            if (currentUser == null)
+            {
+                return BadRequest();
+            }
+            if (!currentUser.IsAdmin)
+            {
+                return Forbid();
             }
 
             if (id == null)
             {
                 return BadRequest();
-            }
-
-            var currentUser = await _userRepository.GetById(currentUserID);
-
-            if (currentUser == null)
-            {
-                return BadRequest();
-            }
-
-            if (!currentUser.IsAdmin)
-            {
-                return Unauthorized();
             }
 
             if (await _userRepository.FindAsync(id.ID) == null)

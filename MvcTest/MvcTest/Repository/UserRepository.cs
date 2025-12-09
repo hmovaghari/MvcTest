@@ -159,7 +159,7 @@ namespace MyAccounting.Repository
             return null;
         }
 
-        public async Task<bool> ChangeAsync(Guid id, ChangeUser changeUser, string apiKey, [CallerMemberName] string callerName = "")
+        public async Task<bool> ChangeAsync(ChangeUser changeUser, string apiKey, [CallerMemberName] string callerName = "")
         {
             try
             {
@@ -183,16 +183,16 @@ namespace MyAccounting.Repository
             }
             catch (Exception ex)
             {
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(ChangeAsync), callerName, (id, changeUser));
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(ChangeAsync), callerName, changeUser);
                 return false;
             }
         }
 
-        public async Task<bool> EditAsync(Guid id, EditUser editUser, string apiKey, [CallerMemberName] string callerName = "")
+        public async Task<bool> EditAsync(EditUser editUser, string apiKey, [CallerMemberName] string callerName = "")
         {
             try
             {
-                var user = await _context.Users.FindAsync(id);
+                var user = await _context.Users.FindAsync(editUser.UserID);
                 if (user == null)
                 {
                     return false;
@@ -218,7 +218,7 @@ namespace MyAccounting.Repository
             }
             catch (Exception ex)
             {
-                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(EditAsync), callerName, (id, editUser));
+                ErrorLogRepository.SaveErrorLog(_context, ex, nameof(UserRepository), nameof(EditAsync), callerName, editUser);
                 return false;
             }
         }
