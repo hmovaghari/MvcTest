@@ -23,6 +23,25 @@ namespace MvcTest.Controllers
             _apiKeyRepository = new ApiKeyRepository(context);
         }
 
+        /// <summary>
+        /// Is allow to log in
+        /// </summary>
+        /// <remarks>
+        /// sample request body :
+        /// 
+        ///     {
+        ///         "username": "username",
+        ///         "password": "password"
+        ///     }
+        /// 
+        /// sample response body :
+        /// 
+        ///     true
+        /// 
+        /// </remarks>
+        /// <param name="apiKey">API key</param>
+        /// <param name="loginViewModel">Login view model</param>
+        /// <returns>Is allow to log in</returns>
         [HttpPost]
         [Route("Login")]
         public async Task<ActionResult<bool>> Login(string apiKey, LoginViewModel loginViewModel)
@@ -42,6 +61,39 @@ namespace MvcTest.Controllers
         }
 
         // GET: api/UsersApi
+        /// <summary>
+        /// Get all users
+        /// </summary>
+        /// <remarks>
+        /// sample request body :
+        ///
+        ///
+        /// 
+        /// sample response body :
+        ///
+        ///
+        ///     [
+        ///       {
+        ///         "userID": "782e5041-ffe3-401e-abed-28183243a72d",
+        ///         "username": "user1",
+        ///         "email": "user1@weapps.ir",
+        ///         "isActive": true,
+        ///         "isAdmin": true
+        ///       },
+        ///       {
+        ///         "userID": "fb020ce9-af44-477e-9033-44adf6d48114",
+        ///         "username": "user2",
+        ///         "email": "user2@gmail.com",
+        ///         "isActive": true,
+        ///         "isAdmin": false
+        ///       }
+        ///     ]
+        /// 
+        ///    
+        /// </remarks>
+        /// <param name="apiKey">API key</param>
+        /// <param name="currentUserID">Current User Id</param>
+        /// <returns>users list</returns>
         [HttpGet]
         [Route("GetUsers")]
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers(string apiKey, Guid currentUserID)
@@ -65,6 +117,35 @@ namespace MvcTest.Controllers
         }
 
         // GET: api/UsersApi/5
+        /// <summary>
+        /// Get user by id
+        /// </summary>
+        /// <remarks>
+        ///     
+        /// 
+        /// sample request body :
+        /// 
+        ///     {
+        ///        "id": "304bd50e-83b4-40b4-a8eb-5e62c80cf1b0"
+        ///     }
+        /// 
+        /// sample response body :
+        ///
+        ///
+        ///     {
+        ///        "userID": "304bd50e-83b4-40b4-a8eb-5e62c80cf1b0",
+        ///        "username": "user3",
+        ///        "email": "user3@ymail.com",
+        ///        "isActive": true,
+        ///        "isAdmin": false
+        ///     }
+        /// 
+        ///    
+        /// </remarks>
+        /// <param name="apiKey">API key</param>
+        /// <param name="currentUserID">Current User Id</param>
+        /// <param name="id">User ID</param>
+        /// <returns>User info</returns>
         [HttpPost]
         [Route("GetUser")]
         public async Task<ActionResult<UserDTO>> GetUser(string apiKey, Guid currentUserID, GUID id)
@@ -99,6 +180,35 @@ namespace MvcTest.Controllers
             return userDto;
         }
 
+        /// <summary>
+        /// Show user info before change
+        /// </summary>
+        ///
+        /// <remarks>
+        /// 
+        /// sample request body :
+        ///
+        ///
+        ///     {
+        ///       "id": "304bd50e-83b4-40b4-a8eb-5e62c80cf1b0"
+        ///     }
+        /// 
+        /// 
+        /// sample response body :
+        ///
+        ///
+        ///     {
+        ///        "userID": "304bd50e-83b4-40b4-a8eb-5e62c80cf1b0",
+        ///        "isActive": true,
+        ///        "isAdmin": false
+        ///     }
+        /// 
+        ///    
+        /// </remarks>
+        /// <param name="apiKey">API key</param>
+        /// <param name="currentUserID">Current User Id</param>
+        /// <param name="id">User ID</param>
+        /// <returns>info of user</returns>
         [HttpPost]
         [Route("BeforChange")]
         public async Task<ActionResult<ChangeUser>> BeforChange(string apiKey, Guid currentUserID, GUID id)
@@ -140,6 +250,30 @@ namespace MvcTest.Controllers
 
         // PUT: api/UsersApi/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Change User
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// sample request body :
+        ///
+        ///
+        ///     {
+        ///       "userID": "304bd50e-83b4-40b4-a8eb-5e62c80cf1b0",
+        ///       "isActive": true,
+        ///       "isAdmin": true
+        ///     }
+        /// 
+        /// 
+        /// sample response body :
+        ///     
+        ///     
+        ///    
+        /// </remarks>
+        /// <param name="apiKey">API key</param>
+        /// <param name="currentUserID">Current User Id</param>
+        /// <param name="changeUser">Change User Info</param>
+        /// <returns></returns>
         [HttpPut]
         [Route("ChangeUser")]
         public async Task<IActionResult> changeUser(string apiKey, Guid currentUserID, ChangeUser changeUser)
@@ -174,6 +308,34 @@ namespace MvcTest.Controllers
             }
         }
 
+        /// <summary>
+        /// Show user info before edit
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// sample request body :
+        /// 
+        ///
+        ///     {
+        ///       "id": "2a4fb175-f3c0-4de8-b589-91d39118dba0"
+        ///     }
+        /// 
+        /// sample response body :
+        ///     
+        ///
+        ///     {
+        ///        "userID": "2a4fb175-f3c0-4de8-b589-91d39118dba0",
+        ///        "username": "user4",
+        ///        "email": "user4@gmail.com",
+        ///        "newPassword": null,
+        ///        "confirmNewPassword": null
+        ///     }
+        ///    
+        /// </remarks>
+        /// <param name="apiKey">API key</param>
+        /// <param name="currentUserID">Current User Id</param>
+        /// <param name="id">User ID</param>
+        /// <returns>info of user</returns>
         [HttpPost]
         [Route("BeforEdit")]
         public async Task<ActionResult<EditUser>> BeforEdit(string apiKey, Guid currentUserID, GUID id)
@@ -205,6 +367,30 @@ namespace MvcTest.Controllers
 
         // PUT: api/UsersApi/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Edit user
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// sample request body :
+        /// 
+        ///     {
+        ///        "userID": "35fdf87d-239d-4bd5-979f-bf20bbf6d25a",
+        ///        "username": "new_user_name",
+        ///        "email": "new_email@mail.com",
+        ///        "newPassword": null,
+        ///        "confirmNewPassword": null
+        ///     }
+        /// 
+        /// sample response body :
+        ///     
+        ///     
+        ///    
+        /// </remarks>
+        /// <param name="apiKey">API key</param>
+        /// <param name="currentUserID">Current User Id</param>
+        /// <param name="editUser">Edit User Info</param>
+        /// <returns></returns>
         [HttpPut]
         [Route("EditUser")]
         public async Task<IActionResult> EditUser(string apiKey, Guid currentUserID, EditUser editUser)
@@ -236,6 +422,36 @@ namespace MvcTest.Controllers
 
         // POST: api/UsersApi
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Create a new user
+        /// </summary>
+        ///
+        /// <remarks>
+        /// 
+        /// sample request body :
+        /// 
+        ///     {
+        ///        "userID": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        ///        "username": "new_user",
+        ///        "email": "new_user@example.com",
+        ///        "password": "asdf123456789qwerty",
+        ///        "confirmPassword": "asdf123456789qwerty"
+        ///     }
+        /// 
+        /// sample response body :
+        ///
+        ///     {
+        ///       "userID": "00a10035-b6bb-4d79-88b0-202252765f93",
+        ///       "username": "new_user",
+        ///       "email": "new_user@example.com",
+        ///       "password": "asdf123456789qwerty",
+        ///       "confirmPassword": "asdf123456789qwerty"
+        ///     }
+        ///    
+        /// </remarks>
+        /// <param name="apiKey">API key</param>
+        /// <param name="createUser">Create User Info</param>
+        /// <returns>User Info</returns>
         [HttpPost]
         [Route("CreateUser")]
         public async Task<ActionResult<UserDTO>?> CreateUser(string apiKey, CreateUser createUser)
@@ -251,6 +467,28 @@ namespace MvcTest.Controllers
         }
 
         // DELETE: api/UsersApi/5
+        /// <summary>
+        /// Delete User
+        /// </summary>
+        ///
+        /// <remarks>
+        ///
+        /// sample request body :
+        /// 
+        ///
+        ///     {
+        ///        "id": "00a10035-b6bb-4d79-88b0-202252765f93"
+        ///     }
+        /// 
+        /// sample response body :
+        ///     
+        /// 
+        ///    
+        /// </remarks>
+        /// <param name="apiKey">API key</param>
+        /// <param name="currentUserID">Current User Id</param>
+        /// <param name="id">User ID</param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("DeleteUser")]
         public async Task<IActionResult> DeleteUser(string apiKey, Guid currentUserID, GUID id)
