@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 using MyAccounting.Data;
 using MyAccounting.Middleware;
 
@@ -46,6 +47,17 @@ namespace MvcTest
             // Swagger
             builder.Services.AddSwaggerGen(c =>
             {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "MyAccounting API",
+                    Version = "v1",
+                    Description = "MyAccounting API Documentation",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Hamed Movaghari",
+                        Email = "hmovaghari@gmail.com"
+                    }
+                });
 
                 //// Set the comments path for the Swagger JSON and UI.
                 //var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
